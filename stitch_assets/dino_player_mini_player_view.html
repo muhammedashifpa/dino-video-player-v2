@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dino Player - Mini-Player View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ad2bee",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#120a16",
+                        "surface-dark": "#1c1122",
+                        "border-dark": "#2d1b36",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="relative flex h-screen w-full flex-col max-w-[430px] mx-auto bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden border-x border-border-dark/30">
+<!-- Top Navigation Header -->
+<header class="flex items-center justify-between px-4 py-3 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-30 border-b border-border-dark/20">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl filled-icon">play_circle</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white uppercase">Dino Player</h1>
+</div>
+<div class="flex gap-4">
+<button class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">cast</span>
+</button>
+<button class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<!-- Category Pills -->
+<div class="flex gap-2 p-3 overflow-x-auto whitespace-nowrap bg-background-light dark:bg-background-dark z-20">
+<button class="px-4 py-1.5 rounded-full bg-primary text-white text-sm font-medium">All</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-dark/50 dark:bg-surface-dark border border-border-dark/30 text-slate-400 text-sm font-medium">AI Technology</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-dark/50 dark:bg-surface-dark border border-border-dark/30 text-slate-400 text-sm font-medium">Income Streams</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-dark/50 dark:bg-surface-dark border border-border-dark/30 text-slate-400 text-sm font-medium">Music</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-dark/50 dark:bg-surface-dark border border-border-dark/30 text-slate-400 text-sm font-medium">Gaming</button>
+</div>
+<!-- Scrollable Feed -->
+<main class="flex-1 overflow-y-auto pb-32">
+<!-- Video Card 1 -->
+<div class="mb-6 group">
+<div class="relative w-full aspect-video bg-surface-dark overflow-hidden">
+<img alt="AI Neural Networks visualization" class="w-full h-full object-cover" data-alt="Abstract glowing neural network connection lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBohMWFs5d3vBT4fkmSHyvFADGPG-8GhWz7kKhLaru1HjXL32GEqmrBiOpqH2dOb_qRVZo569HtrXzZnXLWYJ2hqOnw26t2heBmEJaAm9cQLciGNOzVkJtKRpVqaZhvv2Xwz0E3c3fLj95usZAleXlxbj-GStgMwByL3nI3VxMk9Jx5MjKxC-4FGbxI9rP9l1En1GlncC6AGGVkcPQGsJ_7Nb5YR9xfCPO7Xd2TO1IYYPl_K_VgDPmG5AGKw1YPFpwn6fzFQOsrGT9x"/>
+<span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">14:22</span>
+</div>
+<div class="flex gap-3 p-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0 border border-primary/30 overflow-hidden">
+<img alt="Creator profile" class="w-full h-full object-cover" data-alt="Close up portrait of a male tech creator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkiIu9KNl5vXRVnimo420mieAKmSRbvd2Az3VGK3Hv58SCE7ztvgFOXfcpf5hHm7Hl4ZwpyzODgjs-ChgSkMHQL8JZb-TUnGZIQE_RmZmH7VMDXObPiCntqwNbgHMNxbdzmM__c6q_sVMBhQ16YfA0F2phRI77p0PMU2wJ09jcSiDVHDFpKekZGBiiBO30MVKth_TcayuA_XVYdTeuN87IRTqHy_zoVG6XiM98P_AtzP8VYisRTbJGQ0TKz6LfDDQKyNAoa49YN84O"/>
+</div>
+<div class="flex flex-col">
+<h3 class="text-sm font-bold leading-tight text-slate-900 dark:text-white line-clamp-2">How AI is changing Social Media forever: The New Era of Content</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Dino AI Labs • 1.2M views • 2 days ago</p>
+</div>
+<button class="ml-auto text-slate-400">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Video Card 2 -->
+<div class="mb-6 group">
+<div class="relative w-full aspect-video bg-surface-dark overflow-hidden">
+<img alt="Stock market graphs and technology" class="w-full h-full object-cover" data-alt="Stock market charts glowing on a dark screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEt87M2WPlpfLbkxgXISQQHjZ6WNnt4zZAJ7KaCnMhzWGL3zqbvq46qgqrgV6bsnAh0lbzyzc6pozGJ-kfQJe6BM8aoShVzCIN_RdZB4ZhBPyuZzLJPEWbN5UwSD38kK-ASkrrIEJ5y__p3XnPpFPg78X2JUCzo1mc0CJspEnPPoGXEKFm-xxaONWkJ9C0TFiqdLAn0UOXla0OAI7oUWeLCGlEf-dRZtGehVRc4ykgRvEG3_RrsKrWe9Uu7TsXwWbi5EWgRX15prfS"/>
+<span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">08:45</span>
+</div>
+<div class="flex gap-3 p-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0 border border-primary/30 overflow-hidden">
+<img alt="Creator profile" class="w-full h-full object-cover" data-alt="Portrait of a female entrepreneur smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWeqIj9ljOBMkcGvuamd-rB5y2wLN8udgJDN03GBalz3g0b1j1G1BWFdb5zBhOvLja4fVuCSpjSJNXAF-P1PrClGY-aKXOhNYqMgNvkQK7kyePAhnyhZ3iqcpVYGjetKZIlc73a6eUGtBOX_hcOT-Q2YBayvK82qeq3cquUpSMBZWFAjL7jQu4wHoHaoC-WU7Y6F4LjwrxaVZjpC-VRXRJMlNsjFatOQbY42r3G0axp41KxOCNV8j0pOHE7rSgomoIqN9LrDxbygwR"/>
+</div>
+<div class="flex flex-col">
+<h3 class="text-sm font-bold leading-tight text-slate-900 dark:text-white line-clamp-2">Top 5 AI Income Streams to Start in 2024 (Passive &amp; Active)</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Future Wealth • 850K views • 5 hours ago</p>
+</div>
+<button class="ml-auto text-slate-400">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Video Card 3 (Peek) -->
+<div class="mb-6 group opacity-60">
+<div class="relative w-full aspect-video bg-surface-dark overflow-hidden">
+<img alt="Cybersecurity matrix background" class="w-full h-full object-cover" data-alt="Green matrix code digital data stream" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjAz1SWabhvSPrXRBo6_fZRbGr1WinwRW6cpP22-2vAwuGDPvECYOFAhyz6kx1zEjB9cfGtFIohfzV91_aoGHOYblyHbkkKqwjQL4xKG57eqW8y90_xFovmRJCwSnV8tSk4GCtiC8XgYG-l8UPyuKXBDu_eoHo7MhlJVpBOEiVsu8hCQ-qnwJTqODn4QjiyQwyfqW40i5b9q-dmvbN1DwLttsnl6vU8gY4ztQkoMRIEEKi99jsmuJxaJBg7f0hEvYSK8H5HYtPicQv"/>
+</div>
+</div>
+</main>
+<!-- Persistent UI Layer (Mini-Player + Bottom Nav) -->
+<div class="absolute bottom-0 left-0 w-full z-40">
+<!-- Mini-Player Bar -->
+<div class="mx-2 mb-2 bg-surface-dark/95 border border-border-dark/50 backdrop-blur-xl rounded-xl shadow-2xl overflow-hidden flex items-center h-16 group">
+<!-- Mini-Player Content -->
+<div class="flex items-center flex-1 min-w-0 pr-2">
+<!-- Thumbnail -->
+<div class="w-20 h-full flex-shrink-0 relative">
+<img alt="Current playing video" class="w-full h-full object-cover" data-alt="Digital grid pattern with glowing nodes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP2CloxiR6GZNzzwk0nAGR7sQijIcSiBJfkOxkSIaSua6NdDNPkn5rWtr8b-_8jMLyVS5BmwYU39L3A_fVjrVJrKwuNvxrwkfUErRPBJDc2LtNgUjx2wFhfhaxRFtweFVk30nmN6QeWc5ZDuwJOKVJBtdchTbQP7nHMUzcU7eNBf4O0v6jDvReP-tp5BQqR6cH2pUEHFDRPG7kN2yelEB8Uvlu2q2Hjx6K0ybs1Rjd1-OGNAEJ7LW1z3E-mz7Cxa2xMcjuXFPOrK8j"/>
+<div class="absolute inset-0 bg-primary/10 flex items-center justify-center">
+<div class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+</div>
+</div>
+<!-- Metadata Truncated -->
+<div class="ml-3 flex-1 min-w-0">
+<p class="text-xs font-bold text-white truncate">Mastering Neural Networks: From Zero to Hero in 2024</p>
+<p class="text-[10px] text-slate-400 truncate">Tech Master Academy</p>
+</div>
+<!-- Controls -->
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 flex items-center justify-center text-white hover:text-primary transition-colors">
+<span class="material-symbols-outlined filled-icon text-2xl">pause</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Progress Line -->
+<div class="absolute bottom-0 left-0 h-[2px] w-full bg-white/10">
+<div class="h-full bg-primary w-[35%] shadow-[0_0_8px_rgba(173,43,238,0.8)]"></div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="bg-background-light dark:bg-surface-dark/95 backdrop-blur-md border-t border-border-dark/40 px-6 pt-2 pb-6 flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined filled-icon">home</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Explore</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">subscriptions</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Subs</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<div class="w-6 h-6 rounded-full border border-slate-700 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover grayscale" data-alt="User avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLmfgZYWj9Q9df0_8AVqCzDbhC_MpjyQSXo_nwBodQJcKaS_j8HBLw6zfoNCZWJ_yVhhcfJ22bgkpBmCgH3jZNG8R-0duu_7zIi8SgYSJoB1WUDWZ1ifazL1Gv-BnOuZODL_IGTLq-ZriJG3ACriEBMM0OzvyLUD_b_aOFNINWjJCL2o3GbpnBDo4c9gseN1FLieHUCW1WTeqevSGvqY_u5u8ePv_IoK6eol0Ae9IEOEe-tCQn2TQ7a51z3NqOoZ-wSZ9F6BLb1noD"/>
+</div>
+<span class="text-[10px] font-medium uppercase tracking-wider">Me</span>
+</a>
+</nav>
+<!-- iOS Home Indicator Area (Visual placeholder) -->
+<div class="h-1 bg-background-light dark:bg-surface-dark/95 w-full flex justify-center pb-2">
+<div class="w-32 h-1 bg-slate-400/20 rounded-full mt-2"></div>
+</div>
+</div>
+</div>
+</body></html>
