@@ -8,9 +8,12 @@ import BottomNav from './components/BottomNav';
 import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
+import { usePlayerStore } from './store/usePlayerStore';
+import VideoPlayerOverlay from './components/VideoPlayerOverlay';
 
 function App() {
   const scrollRef = useRef<HTMLElement>(null);
+  const play = usePlayerStore((state) => state.play);
   
   const { 
     categories, 
@@ -22,8 +25,23 @@ function App() {
 
   const hidden = useScrollVisibility(scrollRef);
 
+  const handleVideoClick = (video: any) => {
+    // Transform video data to match store Video type
+    // In a real app, types should be consistent
+    play({
+      slug: video.title, // using title as slug for now
+      title: video.title,
+      thumbnailUrl: video.thumbnailUrl,
+      mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      channelName: video.channelName,
+      channelAvatarUrl: video.channelAvatarUrl,
+      categorySlug: video.categorySlug || 'all'
+    });
+  };
+
   return (
     <Layout>
+      <VideoPlayerOverlay />
       <motion.div
         variants={{
           visible: { y: 0 },
@@ -83,7 +101,7 @@ function App() {
                   }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
-                  <VideoCard {...video} />
+                  <VideoCard {...video} onClick={() => handleVideoClick(video)} />
                 </motion.div>
               ))}
             </motion.div>

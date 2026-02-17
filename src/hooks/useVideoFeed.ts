@@ -34,6 +34,7 @@ export const useVideoFeed = (): UseVideoFeedReturn => {
           channelName: c.category.name,
           views: `${Math.floor(Math.random() * 900 + 100)}K views`,
           uploadedAt: '2 days ago', // Mock date
+          categorySlug: c.category.slug,
         }))
       );
 

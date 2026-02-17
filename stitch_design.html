@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dino Player - Video View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ad2bee",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0a0a0a",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Custom scrollbar for related videos */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<!-- Main Container (Mobile Frame Look) -->
+<div class="relative mx-auto flex h-screen max-w-md flex-col overflow-hidden bg-background-dark shadow-2xl">
+<!-- Drag Handle (Top Center) -->
+<div class="flex w-full justify-center pt-3 pb-1 shrink-0 z-50">
+<div class="h-1.5 w-12 rounded-full bg-white/20"></div>
+</div>
+<!-- Video Player Section (16:9) -->
+<div class="relative w-full aspect-video bg-black shrink-0 overflow-hidden group">
+<!-- Main Video Background -->
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Abstract neural network glowing blue and purple connections" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDt-LmQNa8t_GZRxMEfLyQfxLhM4kC74BlOhDHkoy7z68wPHfnrudRWzQBfENiE4bEniRWszWU8PRPB7CfpvMPKBcgW7CgW0eaPza4ewrnBLRqlAe80ABqXBTolgP0Ar0eH8vbFv8EoisxKw54TvS7sAbqWiTuQEum8JVO3omX8HPnNWmOQC_3ALgOA4MzKpD-8rt2UAEmqcwdfOIchK6AQ4S9RpjgB-VVK2v2n56_-QpwoUZjDYg1Un1OeSS3PvzP3Ex2QUcByFKd1');">
+</div>
+<!-- Player Overlay Controls -->
+<div class="absolute inset-0 flex flex-col justify-between bg-black/30 p-4 transition-opacity duration-300">
+<!-- Top Controls (Minimize/Settings) -->
+<div class="flex items-center justify-between">
+<button class="flex items-center justify-center rounded-full bg-black/40 p-1.5 text-white">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</button>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-white">cast</span>
+<span class="material-symbols-outlined text-white">settings</span>
+</div>
+</div>
+<!-- Center Controls (Play/Skip) -->
+<div class="flex items-center justify-center gap-12 text-white">
+<button class="flex items-center justify-center transition-transform active:scale-90">
+<span class="material-symbols-outlined text-4xl">replay_10</span>
+</button>
+<button class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-md transition-transform active:scale-95">
+<span class="material-symbols-outlined text-5xl fill-1">pause</span>
+</button>
+<button class="flex items-center justify-center transition-transform active:scale-90">
+<span class="material-symbols-outlined text-4xl">forward_10</span>
+</button>
+</div>
+<!-- Bottom Progress Bar & Time -->
+<div class="flex flex-col gap-2">
+<div class="relative h-1 w-full rounded-full bg-white/30">
+<div class="absolute top-0 left-0 h-full w-[42%] rounded-full bg-primary shadow-[0_0_10px_rgba(173,43,238,0.8)]"></div>
+<div class="absolute top-1/2 left-[42%] h-3 w-3 -translate-y-1/2 rounded-full bg-primary border-2 border-white"></div>
+</div>
+<div class="flex items-center justify-between px-1 text-[10px] font-medium text-white/90">
+<span>04:22</span>
+<span>10:00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Video Metadata & Interaction -->
+<div class="flex flex-col gap-4 p-4 shrink-0 border-b border-white/5 bg-background-dark">
+<div class="flex flex-col gap-1">
+<h1 class="text-xl font-bold leading-tight tracking-tight text-white font-display">
+                    The Future of Neural Networks: AI Revolution
+                </h1>
+<p class="text-xs text-slate-400">1.2M views • 2 hours ago</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-purple-400 p-[2px]">
+<div class="h-full w-full rounded-full bg-background-dark p-[1px]">
+<img alt="Channel Profile" class="h-full w-full rounded-full object-cover" data-alt="Modern tech channel avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWSIjSaSI732Dr6wmVgcWv9f2QhAmLQOOtL7xxMZBZxKomVtZAyrleQWv9Rxcq0BKPosBdy5f0l8T-lfwmlhMBMRqIu2wQ6XTC9HgsPyayyyP-EBwtpOF1IX9Hk1EtQxngVV5a6dWCEEFHD02Oj5r2pTILGbsy-KNIClho0DHhrhuihWt9PBbg1FEiEAKPjBu3xdvAR2h6_dIM4lV8i-L3R9DQ6PRsVuzzTGuwXwuw7_BcdvPauf60hIHMDyKN5IVU87VI7pGHiroC"/>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-white">Dino Tech Labs</span>
+<span class="text-[10px] text-slate-400">840K Subscribers</span>
+</div>
+</div>
+<button class="rounded-full bg-primary px-5 py-2 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform active:scale-95">
+                    Subscribe
+                </button>
+</div>
+<!-- Category & Interaction Buttons -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+<span class="inline-flex shrink-0 items-center rounded-lg bg-primary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary border border-primary/30">
+                    AI Essentials
+                </span>
+<div class="flex h-8 shrink-0 items-center gap-3 rounded-full bg-white/5 px-4">
+<button class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg">thumb_up</span>
+<span class="text-xs">42K</span>
+</button>
+<div class="h-4 w-[1px] bg-white/10"></div>
+<button class="flex items-center">
+<span class="material-symbols-outlined text-lg">thumb_down</span>
+</button>
+</div>
+<div class="flex h-8 shrink-0 items-center gap-2 rounded-full bg-white/5 px-4">
+<span class="material-symbols-outlined text-lg">share</span>
+<span class="text-xs">Share</span>
+</div>
+<div class="flex h-8 shrink-0 items-center gap-2 rounded-full bg-white/5 px-4">
+<span class="material-symbols-outlined text-lg">playlist_add</span>
+<span class="text-xs">Save</span>
+</div>
+</div>
+</div>
+<!-- Related Videos Feed -->
+<div class="flex-1 overflow-y-auto bg-background-dark/50 px-4 pt-4 no-scrollbar">
+<h2 class="mb-4 text-sm font-bold uppercase tracking-widest text-slate-500">Up Next</h2>
+<div class="space-y-6 pb-24">
+<!-- Related Video Card 1 -->
+<div class="flex gap-3">
+<div class="relative aspect-video w-36 shrink-0 overflow-hidden rounded-lg bg-slate-800">
+<img alt="Cybersecurity" class="h-full w-full object-cover" data-alt="Neon binary code on computer screen background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYZ7nvKNMewKggrviIomTHoXwm8VajT3vT-m2jB3XIccqacKg4b2YiKut99oVttfIoaaV6VT40SD0Sgxilro8c4wzZ1FUZlK2thzCVzNV7RNkcJU-yHVai8MoRPh8FvEwNvRGrmV8ODmEQNkzuZXalZtsVSnXKOwxQpHazW_6suFEjva81cE3f7w-7akhBpg040vKR41a6aeK3G5DKAra_l7un4Fj78Xebfbs_u_3Arefy_kH0yxlZPnotZkzyBCNoxtcw7UnVAQT1"/>
+<span class="absolute bottom-1 right-1 rounded bg-black/80 px-1 text-[10px] font-medium text-white">12:45</span>
+</div>
+<div class="flex flex-col gap-1 overflow-hidden">
+<h3 class="line-clamp-2 text-sm font-bold leading-snug text-white">Cybersecurity in the Age of Large Language Models</h3>
+<p class="text-[11px] text-slate-400">Cyber Sentinel • 240K views</p>
+</div>
+</div>
+<!-- Related Video Card 2 -->
+<div class="flex gap-3">
+<div class="relative aspect-video w-36 shrink-0 overflow-hidden rounded-lg bg-slate-800">
+<img alt="Robotics" class="h-full w-full object-cover" data-alt="Futuristic robotic hand touching digital interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7o2T5dNAzg9STy5_2wjrqRqEI5AmPnlCct-EcQbgkhmOteiQ5iQXeBD3P-3lKu3RDkDpRbOYJ0hj0KGhuNwZ7XRMKKjWh1XSt0UBcg7RQQE2BhnOXdhO3qK2EHoNOWlrbcXl5tCrrvDglJ9y-k1W81cDLex9s1X287qokrJdyXacnaBqLv5KHRnZAHlxiBMPpzD8khl2L7yd_dp2KyV_n6bA_15Vb9YZr2AuNsciwtuflVjeYGlkRyG9G5Sj01qB9Y1suyEn9AGQ"/>
+<span class="absolute bottom-1 right-1 rounded bg-black/80 px-1 text-[10px] font-medium text-white">08:12</span>
+</div>
+<div class="flex flex-col gap-1 overflow-hidden">
+<h3 class="line-clamp-2 text-sm font-bold leading-snug text-white">Humanoid Robots: Are they finally ready?</h3>
+<p class="text-[11px] text-slate-400">Future Tech • 89K views</p>
+</div>
+</div>
+<!-- Related Video Card 3 -->
+<div class="flex gap-3">
+<div class="relative aspect-video w-36 shrink-0 overflow-hidden rounded-lg bg-slate-800">
+<img alt="Abstract AI" class="h-full w-full object-cover" data-alt="Colorful abstract flowing energy patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUu4YcScNrxDG8KRMhOIXoqfZVCT482GLM0bCmqRiEz-61UbvwZ4h5vkDP2_YEfCO8DtsxDWfaxtjSG8G9ndMM5d4kVD4d-xufkyjn0Cf066FWpG64e_9up31J-jwztl39m4Oo9mkNzwZyJRvpPAANq3hPzeqALePe_nFPehiW1rSbn_ZS4JhtTk75y-3thboC2bSzGdU7Ec-EaXcX04s2lCDBBwQCTVyiNvYObzPryj4zdIWXFDnZOHEChvyhRK3LchWZQUjHn7AE"/>
+<span class="absolute bottom-1 right-1 rounded bg-black/80 px-1 text-[10px] font-medium text-white">15:30</span>
+</div>
+<div class="flex flex-col gap-1 overflow-hidden">
+<h3 class="line-clamp-2 text-sm font-bold leading-snug text-white">Generative Art: The New Creative Frontier</h3>
+<p class="text-[11px] text-slate-400">Art Pulse • 1.1M views</p>
+</div>
+</div>
+<!-- Related Video Card 4 -->
+<div class="flex gap-3">
+<div class="relative aspect-video w-36 shrink-0 overflow-hidden rounded-lg bg-slate-800">
+<img alt="Chips" class="h-full w-full object-cover" data-alt="Close up of high tech microchip circuits" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv2cXZQHSrro_35Wg-NaiAsItk_Gnj1HqJsXCqhmpPfURPKYoywYjlyFqNVNkmqo9W16b69GvXlzBT9oDr-VoJVE5rVBVE1gKr2MuGXKxSph-aSXDdHUwQXA3WhlrymQtribGFLSd7Ux850lUnvOndEJ8gqTzBkboEPLp6VXGL4LbzPnlsXlX9710Tg5xsWtvmHGkAV7KhC89tozp3HUsYvQiD1SJfy5v_n9jrLcmkoEmWFATkRS8G_j6Ue_HTB1VZW6Q3ewY4A8-f"/>
+<span class="absolute bottom-1 right-1 rounded bg-black/80 px-1 text-[10px] font-medium text-white">05:22</span>
+</div>
+<div class="flex flex-col gap-1 overflow-hidden">
+<h3 class="line-clamp-2 text-sm font-bold leading-snug text-white">Quantum Computing Explained in 5 Minutes</h3>
+<p class="text-[11px] text-slate-400">Physics Guru • 3M views</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Navigation -->
+<div class="absolute inset-x-0 bottom-0 z-50 flex items-center justify-around border-t border-white/5 bg-background-dark/80 backdrop-blur-xl px-4 pb-8 pt-3">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl fill-1">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">explore</span>
+<span class="text-[10px] font-medium">Explore</span>
+</a>
+<div class="relative -top-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 ring-4 ring-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">subscriptions</span>
+<span class="text-[10px] font-medium">Subs</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">video_library</span>
+<span class="text-[10px] font-medium">Library</span>
+</a>
+</div>
+</div>
+</body></html>

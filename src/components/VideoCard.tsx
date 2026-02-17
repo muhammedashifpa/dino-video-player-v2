@@ -8,6 +8,8 @@ export interface VideoCardProps {
   channelName: string;
   views: string;
   uploadedAt: string;
+  onClick?: () => void;
+  categorySlug?: string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({
@@ -18,9 +20,10 @@ const VideoCard: React.FC<VideoCardProps> = ({
   channelName,
   views,
   uploadedAt,
+  onClick,
 }) => {
   return (
-    <div className="mb-6 group cursor-pointer">
+    <div className="mb-6 group cursor-pointer" onClick={onClick}>
       <div className="relative w-full aspect-video bg-surface-dark overflow-hidden">
         <img
           alt={title}
