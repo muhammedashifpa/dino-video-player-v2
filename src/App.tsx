@@ -1,4 +1,5 @@
-
+import { useRef, useState } from 'react';
+import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import Layout from './components/Layout';
 import Header from './components/Header';
 import CategoryPills from './components/CategoryPills';
@@ -36,11 +37,36 @@ const dummyVideos: VideoCardProps[] = [
 ];
 
 function App() {
+  const scrollRef = useRef<HTMLElement>(null);
+  const { scrollY } = useScroll({
+    container: scrollRef,
+  });
+  const [hidden, setHidden] = useState(false);
+
+  useMotionValueEvent(scrollY, 'change', (current) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (current > previous && current > 50) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  });
+
   return (
     <Layout>
-      <Header />
-      <CategoryPills />
-      <main className="flex-1 overflow-y-auto pb-32">
+      <motion.div
+        variants={{
+          visible: { y: 0 },
+          hidden: { y: '-100%' },
+        }}
+        animate={hidden ? 'hidden' : 'visible'}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="absolute top-0 left-0 w-full z-30 flex flex-col"
+      >
+        <Header />
+        <CategoryPills />
+      </motion.div>
+      <main ref={scrollRef} className="flex-1 overflow-y-auto pb-32 pt-[120px]">
         {dummyVideos.map((video, index) => (
           <VideoCard key={index} {...video} />
         ))}

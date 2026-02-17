@@ -1,8 +1,10 @@
 import React from 'react';
 
+
+
 const Header: React.FC = () => {
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-30 border-b border-border-dark/20">
+    <header className="flex items-center justify-between px-4 py-3 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-border-dark/20">
       <div className="flex items-center gap-2">
         <div className="bg-primary p-1.5 rounded-lg flex items-center justify-center">
           <span className="material-symbols-outlined text-white text-xl filled-icon">
@@ -27,5 +29,6 @@ const Header: React.FC = () => {
     </header>
   );
 };
+
 
 export default Header;
