@@ -2,9 +2,9 @@ import React from 'react';
 
 const SkeletonVideoCard: React.FC = () => {
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-3 py-4">
       {/* Thumbnail Skeleton */}
-      <div className="aspect-video w-full rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse relative" />
+      <div className="aspect-video w-full bg-gray-200 dark:bg-gray-700 animate-pulse relative" />
 
       <div className="flex gap-3 items-start">
         {/* Avatar Skeleton */}
