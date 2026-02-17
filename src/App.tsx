@@ -1,66 +1,26 @@
-import { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'motion/react';
+import { useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import Layout from './components/Layout';
 import Header from './components/Header';
 import CategoryPills from './components/CategoryPills';
-import VideoCard, { type VideoCardProps } from './components/VideoCard';
+import VideoCard from './components/VideoCard';
 import BottomNav from './components/BottomNav';
 import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
-import { MOCK_DATA } from './data/mockData';
+import { useVideoFeed } from './hooks/useVideoFeed';
+import { useScrollVisibility } from './hooks/useScrollVisibility';
 
 function App() {
   const scrollRef = useRef<HTMLElement>(null);
-  const { scrollY } = useScroll({
-    container: scrollRef,
-  });
-  const [hidden, setHidden] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [categories, setCategories] = useState<string[]>(['All']);
-  const [videos, setVideos] = useState<VideoCardProps[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  const { 
+    categories, 
+    isLoading, 
+    selectedCategory, 
+    setSelectedCategory, 
+    filteredVideos 
+  } = useVideoFeed();
 
-  useMotionValueEvent(scrollY, 'change', (current) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (current > previous && current > 50) {
-      setHidden(true);
-    } else {
-      setHidden(false);
-    }
-  });
-
-  useEffect(() => {
-    const loadData = async () => {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const loadedCategories = ['All', ...MOCK_DATA.categories.map((c) => c.category.name)];
-      
-      const loadedVideos: VideoCardProps[] = MOCK_DATA.categories.flatMap((c) =>
-        c.contents.map((video) => ({
-          thumbnailUrl: video.thumbnailUrl,
-          duration: '10:00', // Mock duration as it's missing in data
-          channelAvatarUrl: c.category.iconUrl,
-          title: video.title,
-          channelName: c.category.name,
-          views: `${Math.floor(Math.random() * 900 + 100)}K views`,
-          uploadedAt: '2 days ago', // Mock date
-        }))
-      );
-
-      // Shuffle videos for a more "feed-like" feel
-        const shuffledVideos = loadedVideos.sort(() => Math.random() - 0.5);
-
-      setCategories(loadedCategories);
-      setVideos(shuffledVideos);
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, []);
-
-  const filteredVideos = selectedCategory === 'All' 
-    ? videos 
-    : videos.filter((video) => video.channelName === selectedCategory);
+  const hidden = useScrollVisibility(scrollRef);
 
   return (
     <Layout>
@@ -83,7 +43,7 @@ function App() {
       </motion.div>
       <main ref={scrollRef} className="flex-1 overflow-y-auto pb-32 pt-[120px]">
         {isLoading ? (
-          // Render Skeletons
+          // Render Skeletons in a grid or list
           Array.from({ length: 6 }).map((_, index) => (
             <SkeletonVideoCard key={index} />
           ))

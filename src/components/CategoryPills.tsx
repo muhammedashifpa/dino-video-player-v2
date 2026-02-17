@@ -21,13 +21,7 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({
   return (
     <div
       className="flex gap-2 p-3 overflow-x-auto whitespace-nowrap bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-20 scrollbar-none"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
-      <style>{`
-        .scrollbar-none::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
       <motion.div
         className="flex gap-2"
         initial="hidden"
