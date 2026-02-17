@@ -1,10 +1,15 @@
-import React from 'react';
+import SkeletonCategoryPills from './skeletons/SkeletonCategoryPills';
 
+interface CategoryPillsProps {
+  categories?: string[];
+  isLoading?: boolean;
+}
 
-const categories = ['All', 'AI Technology', 'Income Streams', 'Music', 'Gaming', 'Live', 'News'];
+const CategoryPills: React.FC<CategoryPillsProps> = ({ categories = [], isLoading = false }) => {
+  if (isLoading) {
+    return <SkeletonCategoryPills />;
+  }
 
-
-const CategoryPills: React.FC = () => {
   return (
     <div
       className="flex gap-2 p-3 overflow-x-auto whitespace-nowrap bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-20 scrollbar-none"
