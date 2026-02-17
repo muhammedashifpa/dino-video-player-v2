@@ -1,12 +1,47 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useInView, useSpring, useMotionValue } from 'motion/react';
 import { usePlayerStore, type Video } from '../store/usePlayerStore';
 import VideoPlayerControls from './VideoPlayerControls';
 import { useVideoFeed } from '../hooks/useVideoFeed';
 import RelatedVideoCard from './RelatedVideoCard';
 import type { VideoCardProps } from './VideoCard';
-
 import CategoryPills from './CategoryPills';
+
+// Helper to generate a stable random like count based on string hash
+const getStableLikes = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  const positiveHash = Math.abs(hash);
+  return (positiveHash % 90000) + 5000; // Random number between 5000 and 95000
+};
+
+const AnimatedCounter = ({ value }: { value: number }) => {
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { stiffness: 50, damping: 15 });
+  const ref = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  React.useEffect(() => {
+    return springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = Intl.NumberFormat('en-US', { 
+          notation: "compact", 
+          maximumFractionDigits: 1,
+          minimumFractionDigits: 1 
+        }).format(Math.floor(latest));
+      }
+    });
+  }, [springValue]);
+
+  return <span ref={ref} className="text-xs tabular-nums text-right min-w-[4ch]" />;
+};
 
 const VideoPlayerOverlay: React.FC = () => {
   const { 
@@ -20,6 +55,10 @@ const VideoPlayerOverlay: React.FC = () => {
   } = usePlayerStore();
 
   const { categories, selectedCategory, setSelectedCategory, filteredVideos, isLoading } = useVideoFeed(true);
+
+  // Sentinel for sticky detection
+  const sentinelRef = React.useRef(null);
+  const isSticky = !useInView(sentinelRef, { amount: 1 });
 
   React.useEffect(() => {
     if (currentVideo && categories.includes(currentVideo.channelName)) {
@@ -60,6 +99,9 @@ const VideoPlayerOverlay: React.FC = () => {
   const progress = 262; // 04:22
   const duration = 600; // 10:00
 
+  // Generate stable likes
+  const likeCount = currentVideo ? getStableLikes(currentVideo.title) : 0;
+
   return (
     <div className={`absolute inset-0 z-50 flex flex-col bg-background-dark text-white transition-all duration-300 overflow-hidden ${viewMode === 'mini' ? 'top-auto left-auto right-4 bottom-24 w-80 h-48 rounded-lg shadow-2xl border border-white/10' : ''}`}>
       
@@ -96,7 +138,6 @@ const VideoPlayerOverlay: React.FC = () => {
       {viewMode === 'full' && (
         <div className="flex-1 overflow-y-auto bg-background-dark/50 scrollbar-none pb-24 min-h-0">
           {/* Metadata Section */}
-          {/* Metadata Section */}
           <div className="flex flex-col gap-4 py-4 shrink-0 border-b border-white/5 bg-background-dark">
             <AnimatePresence mode="wait">
               <motion.div 
@@ -124,8 +165,8 @@ const VideoPlayerOverlay: React.FC = () => {
                 className="flex items-center justify-between gap-4 px-4 overflow-x-auto scrollbar-none"
               >
                 <div className="flex items-center gap-2 shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-purple-400 p-[2px]">
-                     <div className="h-full w-full rounded-full bg-background-dark p-[1px]">
+                  <div className="h-10 w-10 rounded-full bg-linear-to-tr from-primary to-purple-400 p-[2px]">
+                     <div className="h-full w-full rounded-full bg-background-dark p-px">
                        <img 
                          alt={currentVideo.channelName} 
                          className="h-full w-full rounded-full object-cover" 
@@ -144,9 +185,9 @@ const VideoPlayerOverlay: React.FC = () => {
                   <div className="flex shrink-0 items-center gap-3 rounded-full bg-white/5 px-4 py-2">
                     <button className="flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-lg">thumb_up</span>
-                      <span className="text-xs">42K</span>
+                      <AnimatedCounter value={likeCount} />
                     </button>
-                    <div className="h-4 w-[1px] bg-white/10"></div>
+                    <div className="h-4 w-px bg-white/10"></div>
                     <button className="flex items-center">
                        <span className="material-symbols-outlined text-lg">thumb_down</span>
                     </button>
@@ -169,8 +210,15 @@ const VideoPlayerOverlay: React.FC = () => {
           </div>
 
           {/* Related Videos Section */}
-          <div className="py-2">
-             <div className="mb-2">
+          <div className="relative">
+             {/* Sentinel for sticky detection */}
+             <div ref={sentinelRef} className="absolute -top-1 left-0 right-0 h-1 pointer-events-none" />
+             
+             <div className={`sticky top-0 z-30 transition-all duration-300 mb-2 ${
+               isSticky
+                 ? 'bg-background-dark/95 backdrop-blur-xl border-b border-white/5 shadow-lg' 
+                 : 'bg-transparent'
+             }`}>
                <CategoryPills 
                  categories={categories}
                  isLoading={isLoading}
