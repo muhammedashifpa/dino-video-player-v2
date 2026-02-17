@@ -6,7 +6,7 @@ const SkeletonVideoCard: React.FC = () => {
       {/* Thumbnail Skeleton */}
       <div className="aspect-video w-full bg-gray-200 dark:bg-gray-700 animate-pulse relative" />
 
-      <div className="flex gap-3 items-start">
+      <div className="flex gap-3 items-start px-2">
         {/* Avatar Skeleton */}
         <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0" />
 

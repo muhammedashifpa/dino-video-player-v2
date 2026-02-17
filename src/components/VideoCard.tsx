@@ -10,6 +10,7 @@ export interface VideoCardProps {
   uploadedAt: string;
   onClick?: () => void;
   categorySlug?: string;
+  slug?: string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({

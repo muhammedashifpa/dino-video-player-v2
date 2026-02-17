@@ -12,7 +12,7 @@ interface UseVideoFeedReturn {
   filteredVideos: VideoCardProps[];
 }
 
-export const useVideoFeed = (): UseVideoFeedReturn => {
+export const useVideoFeed = (skipDelay = false): UseVideoFeedReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([DEFAULT_CATEGORY]);
   const [videos, setVideos] = useState<VideoCardProps[]>([]);
@@ -21,7 +21,9 @@ export const useVideoFeed = (): UseVideoFeedReturn => {
   useEffect(() => {
     const loadData = async () => {
       // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, LOAD_DELAY));
+      if (!skipDelay) {
+        await new Promise((resolve) => setTimeout(resolve, LOAD_DELAY));
+      }
 
       const loadedCategories = [DEFAULT_CATEGORY, ...MOCK_DATA.categories.map((c) => c.category.name)];
       
@@ -35,6 +37,7 @@ export const useVideoFeed = (): UseVideoFeedReturn => {
           views: `${Math.floor(Math.random() * 900 + 100)}K views`,
           uploadedAt: '2 days ago', // Mock date
           categorySlug: c.category.slug,
+          slug: video.slug,
         }))
       );
 
@@ -47,7 +50,7 @@ export const useVideoFeed = (): UseVideoFeedReturn => {
     };
 
     loadData();
-  }, []);
+  }, [skipDelay]);
 
   const filteredVideos = selectedCategory === DEFAULT_CATEGORY
     ? videos

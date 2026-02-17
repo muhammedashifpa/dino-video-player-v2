@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Layout from './components/Layout';
 import Header from './components/Header';
 import CategoryPills from './components/CategoryPills';
-import VideoCard from './components/VideoCard';
+import VideoCard, { type VideoCardProps } from './components/VideoCard';
 import BottomNav from './components/BottomNav';
 import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
@@ -25,11 +25,11 @@ function App() {
 
   const hidden = useScrollVisibility(scrollRef);
 
-  const handleVideoClick = (video: any) => {
+  const handleVideoClick = (video: VideoCardProps) => {
     // Transform video data to match store Video type
     // In a real app, types should be consistent
     play({
-      slug: video.title, // using title as slug for now
+      slug: video.slug || video.title, // Use slug if available
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
       mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
