@@ -208,14 +208,8 @@ const VideoPlayerOverlay: React.FC = () => {
       onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
       onMouseMove={handleUserActivity}
       onTouchStart={handleUserActivity}
-      className={`z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl ${
-        viewMode === 'full' ? 'fixed inset-0' : 'fixed'
-      }`}
-      style={{ 
-        flexDirection: viewMode === 'mini' ? 'row' : 'column',
-        left: viewMode === 'full' ? 0 : '',
-        right: viewMode === 'full' ? 0 : ''
-      }}
+      className="absolute z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl "
+      style={{ flexDirection: viewMode === 'mini' ? 'row' : 'column' }}
     >
       
 
