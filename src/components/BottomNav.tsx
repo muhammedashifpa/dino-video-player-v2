@@ -11,8 +11,8 @@ const NAV_ITEMS = [
 const BottomNav: React.FC = () => {
   return (
     <nav 
-      className="bg-background-light dark:bg-surface-dark/95 backdrop-blur-md border-t border-border-dark/40 px-6 pt-2 pb-6 flex justify-between items-center sticky bottom-0 z-40"
-      style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
+      className="fixed bottom-0 w-full bg-background-light dark:bg-surface-dark/95 backdrop-blur-md border-t border-border-dark/40 px-6 pt-2 pb-2 flex justify-between items-center z-40"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}
     >
       {NAV_ITEMS.map((item) => (
         <a 

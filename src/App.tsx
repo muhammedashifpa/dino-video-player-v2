@@ -1,10 +1,9 @@
-import { useRef } from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import Layout from './components/Layout';
 import Header from './components/Header';
 import CategoryPills from './components/CategoryPills';
 import VideoCard, { type VideoCardProps } from './components/VideoCard';
-import BottomNav from './components/BottomNav';
 import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
@@ -12,7 +11,7 @@ import { usePlayerStore } from './store/usePlayerStore';
 import VideoPlayerOverlay from './components/VideoPlayerOverlay';
 
 function App() {
-  const scrollRef = useRef<HTMLElement>(null);
+
   const play = usePlayerStore((state) => state.play);
   
   const { 
@@ -23,7 +22,7 @@ function App() {
     filteredVideos 
   } = useVideoFeed();
 
-  const hidden = useScrollVisibility(scrollRef);
+  const hidden = useScrollVisibility();
 
   const handleVideoClick = (video: VideoCardProps) => {
     // Transform video data to match store Video type
@@ -52,7 +51,7 @@ function App() {
         }}
         animate={hidden ? 'hidden' : 'visible'}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="absolute top-0 left-0 w-full z-30 flex flex-col"
+        className="fixed top-0 left-0 w-full z-30 flex flex-col"
       >
         <Header />
         <CategoryPills 
@@ -62,7 +61,7 @@ function App() {
           onSelect={setSelectedCategory}
         />
       </motion.div>
-      <main ref={scrollRef} className="flex-1 overflow-y-auto pb-32 pt-[120px]">
+      <main className="flex-1 pb-8 pt-[120px]">
         {isLoading ? (
           // Render Skeletons in a grid or list
           Array.from({ length: 6 }).map((_, index) => (
@@ -111,7 +110,6 @@ function App() {
           </AnimatePresence>
         )}
       </main>
-      <BottomNav />
     </Layout>
   );
 }

@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useScroll, useMotionValueEvent } from 'motion/react';
 import { SCROLL_THRESHOLD } from '../utils/constants';
 
-export const useScrollVisibility = (elementRef: React.RefObject<HTMLElement | null>) => {
+export const useScrollVisibility = (elementRef?: React.RefObject<HTMLElement | null>) => {
   const [hidden, setHidden] = useState(false);
-  const { scrollY } = useScroll({
-    container: elementRef,
-  });
+  const { scrollY } = useScroll(
+    elementRef ? { container: elementRef } : {}
+  );
 
   useMotionValueEvent(scrollY, 'change', (current) => {
     const previous = scrollY.getPrevious() ?? 0;

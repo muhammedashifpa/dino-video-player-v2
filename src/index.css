@@ -5,10 +5,8 @@
 @import "tailwindcss/utilities";
 
 html, body {
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none; /* Disable double-tap zoom */
+  /* Remove fixed height to allow document scrolling */
+  touch-action: manipulation;
 }
 
 #root {
