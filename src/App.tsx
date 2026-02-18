@@ -32,7 +32,10 @@ function App() {
       slug: video.slug || video.title, // Use slug if available
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
-      mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      // Fallback to sample video for YouTube links since <video> tag doesn't support them
+      mediaUrl: video.mediaUrl && !video.mediaUrl.includes('youtube') 
+        ? video.mediaUrl 
+        : 'https://www.w3schools.com/html/mov_bbb.mp4',
       channelName: video.channelName,
       channelAvatarUrl: video.channelAvatarUrl,
       categorySlug: video.categorySlug || 'all'

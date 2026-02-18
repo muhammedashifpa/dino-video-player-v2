@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, type PanInfo } from 'motion/react';
 import { usePlayerStore } from '../store/usePlayerStore';
 import VideoPlayerControls from './VideoPlayerControls';
@@ -23,7 +23,11 @@ const VideoPlayerOverlay: React.FC = () => {
     setProgress,
     setDuration
   } = usePlayerStore();
+  
+  const [showControls, setShowControls] = React.useState(true);
+  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { categories, selectedCategory, setSelectedCategory, filteredVideos, isLoading } = useVideoFeed(true);
 
   React.useEffect(() => {
@@ -32,35 +36,78 @@ const VideoPlayerOverlay: React.FC = () => {
     }
   }, [currentVideo, categories, setSelectedCategory]);
 
-  // Simulate playback
-  React.useEffect(() => {
-    if (status === 'playing') {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= duration) {
-            pause();
-            return duration;
-          }
-          return prev + 1;
+  // Sync video playback with store status
+  useEffect(() => {
+    if (videoRef.current) {
+      if (status === 'playing') {
+        videoRef.current.play().catch(() => {
+          // Handle autoplay failure or interruption
+          pause();
         });
-      }, 1000);
-      return () => clearInterval(interval);
+      } else {
+        videoRef.current.pause();
+      }
     }
-  }, [status, duration, pause, setProgress]);
+  }, [status, currentVideo]);
 
-  // Set initial duration when video loads
-  React.useEffect(() => {
-    if (currentVideo) {
-      setDuration(600); // Mock duration 10:00
-      setProgress(0);
+  // Handle video ended
+  const handleVideoEnded = () => {
+    pause();
+  };
+
+  // Handle time update
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setProgress(videoRef.current.currentTime);
     }
-  }, [currentVideo, setDuration, setProgress]);
+  };
+
+  // Handle loaded metadata
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  // Auto-hide controls logic
+  const handleUserActivity = () => {
+    setShowControls(true);
+    
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+
+    if (status === 'playing') {
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (status === 'paused') {
+      setShowControls(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    } else {
+      handleUserActivity();
+    }
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, [status]);
 
   if (viewMode === 'hidden' || !currentVideo) return null;
 
   const isPlaying = status === 'playing';
 
   const handleSeek = (newTime: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
     setProgress(newTime);
   };
 
@@ -73,11 +120,17 @@ const VideoPlayerOverlay: React.FC = () => {
   };
 
   const handleSkipForward = () => {
-    setProgress((prev) => Math.min(prev + 10, duration));
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, duration);
+      setProgress(videoRef.current.currentTime);
+    }
   };
 
   const handleSkipBackward = () => {
-    setProgress((prev) => Math.max(0, prev - 10));
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
+      setProgress(videoRef.current.currentTime);
+    }
   };
 
   // Filter related videos (exclude current video from the already filtered list)
@@ -153,6 +206,8 @@ const VideoPlayerOverlay: React.FC = () => {
       dragElastic={{ bottom: 0.2 }}
       onDragEnd={handleDragEnd}
       onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
+      onMouseMove={handleUserActivity}
+      onTouchStart={handleUserActivity}
       className="absolute z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl "
       style={{ flexDirection: viewMode === 'mini' ? 'row' : 'column' }}
     >
@@ -169,15 +224,23 @@ const VideoPlayerOverlay: React.FC = () => {
         viewMode === 'full' ? 'w-full aspect-video z-10' : 'h-full w-[120px] z-10'
       }`}>
         
-        {/* Main Video Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-80" 
-          style={{ backgroundImage: `url('${currentVideo.thumbnailUrl}')` }}
-        ></div>
+        {/* Main Video Player */}
+        <video
+          ref={videoRef}
+          src={currentVideo.mediaUrl}
+          poster={currentVideo.thumbnailUrl}
+          className="absolute inset-0 h-full w-full object-cover"
+          playsInline
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={handleVideoEnded}
+          onClick={handlePlayPause}
+        />
 
         {/* Video Player Controls (Full Mode) */}
         {viewMode === 'full' && (
           <VideoPlayerControls 
+            isVisible={showControls}
             isPlaying={isPlaying}
             progress={progress}
             duration={duration}

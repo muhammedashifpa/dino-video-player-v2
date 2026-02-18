@@ -10,6 +10,7 @@ interface VideoPlayerControlsProps {
   onSeek: (time: number) => void;
   onMinimize: () => void;
   onClose: () => void;
+  isVisible: boolean;
 }
 
 const formatTime = (seconds: number) => {
@@ -28,6 +29,7 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
   onSeek,
   onMinimize,
   onClose,
+  isVisible,
 }) => {
   const [isSkippingForward, setIsSkippingForward] = useState(false);
   const [isSkippingBackward, setIsSkippingBackward] = useState(false);
@@ -47,7 +49,9 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col justify-between bg-black/30 p-4 transition-opacity duration-300">
+    <div className={`absolute inset-0 flex flex-col justify-between bg-black/30 p-4 transition-opacity duration-300 ${
+      isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    }`}>
       {/* Top Controls (Minimize/Settings) */}
       <div className="flex items-center justify-between">
         <button 

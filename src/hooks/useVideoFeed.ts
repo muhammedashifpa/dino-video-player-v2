@@ -38,6 +38,7 @@ export const useVideoFeed = (skipDelay = false): UseVideoFeedReturn => {
           uploadedAt: '2 days ago', // Mock date
           categorySlug: c.category.slug,
           slug: video.slug,
+          mediaUrl: video.mediaUrl,
         }))
       );
 
