@@ -21,7 +21,8 @@ const VideoPlayerOverlay: React.FC = () => {
     progress,
     duration,
     setProgress,
-    setDuration
+    setDuration,
+    maximize
   } = usePlayerStore();
   
   const [showControls, setShowControls] = React.useState(true);
@@ -213,12 +214,15 @@ const VideoPlayerOverlay: React.FC = () => {
           initial="hidden"
           animate={viewMode as string}
           exit="hidden"
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200,  }}
           drag={viewMode === 'full' ? 'y' : undefined}
           dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={{ bottom: 0.2 }}
+          dragElastic={{ bottom: 0.5 }}
           onDragEnd={handleDragEnd}
-          onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
+          whileTap={{ scale: viewMode === 'mini' ? 0.9 : 1, }}
+          whileDrag={{scaleY:0.9, scaleX:0.9 , borderRadius:15}}
+          whileHover={{ scale: viewMode === 'mini' ? 1.02 : 1 }}
+          onClick={() => viewMode === 'mini' && maximize()}
           onMouseMove={handleUserActivity}
           onTouchStart={handleUserActivity}
           className={`z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl ${
