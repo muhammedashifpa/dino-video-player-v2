@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence, useInView, useSpring, useMotionValue } from 'motion/react';
+import { motion, AnimatePresence, useInView, useSpring, useMotionValue, type PanInfo } from 'motion/react';
 import { usePlayerStore, type Video } from '../store/usePlayerStore';
 import VideoPlayerControls from './VideoPlayerControls';
 import { useVideoFeed } from '../hooks/useVideoFeed';
@@ -102,163 +102,250 @@ const VideoPlayerOverlay: React.FC = () => {
   // Generate stable likes
   const likeCount = currentVideo ? getStableLikes(currentVideo.title) : 0;
 
+
+  // Drag handling
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (viewMode === 'full' && info.offset.y > 100) {
+      minimize();
+    }
+  };
+
+  const overlayVariants = {
+    hidden: { 
+      y: '100%', 
+      opacity: 0,
+      pointerEvents: 'none' as const
+    },
+    full: { 
+      y: 0, 
+      opacity: 1,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: 0,
+      pointerEvents: 'auto' as const
+    },
+    mini: { 
+      y: 0, 
+      opacity: 1,
+      // Dock above bottom nav (approx 80px height + padding)
+      top: 'auto',
+      left: 12,
+      right: 12,
+      bottom: 90, 
+      width: 'calc(100% - 24px)',
+      height: 80,
+      borderRadius: 12,
+      pointerEvents: 'auto' as const
+    }
+  };
+
   return (
-    <div className={`absolute inset-0 z-50 flex flex-col bg-background-dark text-white transition-all duration-300 overflow-hidden ${viewMode === 'mini' ? 'top-auto left-auto right-4 bottom-24 w-80 h-48 rounded-lg shadow-2xl border border-white/10' : ''}`}>
+    <motion.div 
+      variants={overlayVariants}
+      initial="hidden"
+      animate={viewMode as string}
+      exit="hidden"
+      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      drag={viewMode === 'full' ? 'y' : undefined}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={{ bottom: 0.2 }}
+      onDragEnd={handleDragEnd}
+      onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
+      className="absolute z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl border border-black/10 dark:border-white/10"
+      style={{ flexDirection: viewMode === 'mini' ? 'row' : 'column' }}
+    >
       
       {/* Drag Handle (Full Screen Only) */}
       {viewMode === 'full' && (
-        <div className="flex w-full justify-center pt-3 pb-1 shrink-0 z-50 absolute top-0 left-0 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
-          <div className="h-1.5 w-12 rounded-full bg-white/20"></div>
+        <div className="absolute top-0 left-0 right-0 z-50 flex justify-center pt-3 pb-4 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
+          <div className="h-1.5 w-12 rounded-full bg-white/30 backdrop-blur-sm"></div>
         </div>
       )}
 
       {/* Video Player Section */}
-      <div className={`relative w-full bg-black shrink-0 overflow-hidden group ${viewMode === 'full' ? 'aspect-video mt-0' : 'h-full'}`}>
+      <div className={`relative shrink-0 overflow-hidden bg-black transition-all duration-300 ${
+        viewMode === 'full' ? 'w-full aspect-video z-10' : 'h-full w-[120px] z-10'
+      }`}>
         
-        {/* Main Video Background (Mock) */}
+        {/* Main Video Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-80" 
           style={{ backgroundImage: `url('${currentVideo.thumbnailUrl}')` }}
         ></div>
 
-        {/* Video Player Controls */}
-        <VideoPlayerControls 
-          isPlaying={isPlaying}
-          progress={progress}
-          duration={duration}
-          onPlayPause={handlePlayPause}
-          onSkipForward={() => {}} 
-          onSkipBackward={() => {}}
-          onMinimize={minimize}
-          onClose={close}
-        />
+        {/* Video Player Controls (Full Mode) */}
+        {viewMode === 'full' && (
+          <VideoPlayerControls 
+            isPlaying={isPlaying}
+            progress={progress}
+            duration={duration}
+            onPlayPause={handlePlayPause}
+            onSkipForward={() => {}} 
+            onSkipBackward={() => {}}
+            onMinimize={minimize}
+            onClose={close}
+          />
+        )}
       </div>
+
+      {/* Mini Player Info & Controls */}
+      {viewMode === 'mini' && (
+        <div className="flex flex-1 items-center justify-between px-3 min-w-0 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl">
+           <div className="flex flex-col gap-0.5 min-w-0 mr-2">
+             <span className="text-sm font-medium text-slate-900 dark:text-white truncate">{currentVideo.title}</span>
+             <span className="text-xs text-slate-500 dark:text-slate-400 truncate">{currentVideo.channelName}</span>
+           </div>
+           
+           <div className="flex items-center gap-3 shrink-0">
+             <button 
+               onClick={(e) => { e.stopPropagation(); handlePlayPause(); }}
+               className="flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-transform"
+             >
+               <span className="material-symbols-outlined text-2xl">
+                 {isPlaying ? 'pause' : 'play_arrow'}
+               </span>
+             </button>
+             <button 
+               onClick={(e) => { e.stopPropagation(); close(); }}
+               className="flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-transform"
+             >
+               <span className="material-symbols-outlined text-2xl">close</span>
+             </button>
+           </div>
+        </div>
+      )}
 
       {/* Metadata & Related Videos (Hidden in Mini Mode) */}
       {viewMode === 'full' && (
-        <div className="flex-1 overflow-y-auto bg-background-dark/50 scrollbar-none pb-24 min-h-0">
-          {/* Metadata Section */}
-          <div className="flex flex-col gap-4 py-4 shrink-0 border-b border-white/5 bg-background-dark">
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={currentVideo.title}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col gap-1 px-4"
-              >
-                <h1 className="text-xl font-bold leading-tight tracking-tight text-white">
-                  {currentVideo.title}
-                </h1>
-                <p className="text-xs text-slate-400">1.2M views • 2 hours ago</p>
-              </motion.div>
-            </AnimatePresence>
+        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-background-dark">
+          <div className="flex-1 overflow-y-auto scrollbar-none pb-24">
+            {/* Metadata Section */}
+            <div className="flex flex-col gap-4 py-4 shrink-0 border-b border-black/5 dark:border-white/5">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={currentVideo.title}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col gap-1 px-4"
+                >
+                  <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
+                    {currentVideo.title}
+                  </h1>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">1.2M views • 2 hours ago</p>
+                </motion.div>
+              </AnimatePresence>
 
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={currentVideo.categorySlug}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="flex items-center justify-between gap-4 px-4 overflow-x-auto scrollbar-none"
-              >
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-linear-to-tr from-primary to-purple-400 p-[2px]">
-                     <div className="h-full w-full rounded-full bg-background-dark p-px">
-                       <img 
-                         alt={currentVideo.channelName} 
-                         className="h-full w-full rounded-full object-cover" 
-                         src={currentVideo.channelAvatarUrl}
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={currentVideo.categorySlug}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex items-center justify-between gap-4 px-4 overflow-x-auto scrollbar-none"
+                >
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-linear-to-tr from-primary to-purple-400 p-[2px]">
+                       <div className="h-full w-full rounded-full bg-white dark:bg-background-dark p-px">
+                         <img 
+                           alt={currentVideo.channelName} 
+                           className="h-full w-full rounded-full object-cover" 
+                           src={currentVideo.channelAvatarUrl}
+                         />
+                       </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{currentVideo.channelName}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">840K Subscribers</span>
+                    </div>
+                  </div>
+                  
+                  {/* Actions */}
+                  <div className="flex items-center gap-2  py-1">
+                    <div className="flex shrink-0 items-center gap-3 rounded-full bg-black/5 dark:bg-white/5 px-4 py-2">
+                      <button className="flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-lg">thumb_up</span>
+                        <AnimatedCounter value={likeCount} />
+                      </button>
+                      <div className="h-4 w-px bg-black/10 dark:bg-white/10"></div>
+                      <button className="flex items-center">
+                         <span className="material-symbols-outlined text-lg">thumb_down</span>
+                      </button>
+                    </div>
+                     <div className="flex shrink-0 items-center gap-2 rounded-full bg-black/5 dark:bg-white/5 px-4 py-2">
+                    <span className="material-symbols-outlined text-lg">share</span>
+                    <span className="text-xs">Share</span>
+                  </div>
+                   <div className="flex shrink-0 items-center gap-2 rounded-full bg-black/5 dark:bg-white/5 px-4 py-2">
+                    <span className="material-symbols-outlined text-lg">download</span>
+                    <span className="text-xs">Download</span>
+                  </div>
+                   <div className="flex shrink-0 items-center gap-2 rounded-full bg-black/5 dark:bg-white/5 px-4 py-2">
+                    <span className="material-symbols-outlined text-lg">playlist_add</span>
+                    <span className="text-xs">Save</span>
+                  </div>
+                </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Related Videos Section */}
+            <div className="relative">
+               {/* Sentinel for sticky detection */}
+               <div ref={sentinelRef} className="absolute -top-1 left-0 right-0 h-1 pointer-events-none" />
+               
+               <div className={`sticky top-0 z-30 transition-all duration-300 mb-2 ${
+                 isSticky
+                   ? 'bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-b border-black/5 dark:border-white/5 shadow-lg' 
+                   : 'bg-transparent'
+               }`}>
+                 <CategoryPills 
+                   categories={categories}
+                   isLoading={isLoading}
+                   selectedCategory={selectedCategory}
+                   onSelect={setSelectedCategory}
+                 />
+               </div>
+               <AnimatePresence mode="wait">
+                 <motion.div
+                   key={`${selectedCategory}-${currentVideo.title}`}
+                   className="space-y-6 px-4"
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -20 }}
+                   transition={{ duration: 0.2 }}
+                 >
+                   {relatedVideos.map((video, idx) => (
+                     <motion.div
+                        key={`${video.title}-${idx}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                     >
+                       <RelatedVideoCard 
+                         video={{
+                           ...video,
+                           slug: video.slug || video.title,
+                           mediaUrl: '', // Add missing required fields if any
+                           categorySlug: video.categorySlug || 'all'
+                         } as Video}
+                         onClick={() => handleRelatedClick(video)}
                        />
-                     </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-white">{currentVideo.channelName}</span>
-                    <span className="text-[10px] text-slate-400">840K Subscribers</span>
-                  </div>
-                </div>
-                
-                {/* Actions */}
-                <div className="flex items-center gap-2  py-1">
-                  <div className="flex shrink-0 items-center gap-3 rounded-full bg-white/5 px-4 py-2">
-                    <button className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-lg">thumb_up</span>
-                      <AnimatedCounter value={likeCount} />
-                    </button>
-                    <div className="h-4 w-px bg-white/10"></div>
-                    <button className="flex items-center">
-                       <span className="material-symbols-outlined text-lg">thumb_down</span>
-                    </button>
-                  </div>
-                   <div className="flex shrink-0 items-center gap-2 rounded-full bg-white/5 px-4 py-2">
-                  <span className="material-symbols-outlined text-lg">share</span>
-                  <span className="text-xs">Share</span>
-                </div>
-                 <div className="flex shrink-0 items-center gap-2 rounded-full bg-white/5 px-4 py-2">
-                  <span className="material-symbols-outlined text-lg">download</span>
-                  <span className="text-xs">Download</span>
-                </div>
-                 <div className="flex shrink-0 items-center gap-2 rounded-full bg-white/5 px-4 py-2">
-                  <span className="material-symbols-outlined text-lg">playlist_add</span>
-                  <span className="text-xs">Save</span>
-                </div>
-              </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Related Videos Section */}
-          <div className="relative">
-             {/* Sentinel for sticky detection */}
-             <div ref={sentinelRef} className="absolute -top-1 left-0 right-0 h-1 pointer-events-none" />
-             
-             <div className={`sticky top-0 z-30 transition-all duration-300 mb-2 ${
-               isSticky
-                 ? 'bg-background-dark/95 backdrop-blur-xl border-b border-white/5 shadow-lg' 
-                 : 'bg-transparent'
-             }`}>
-               <CategoryPills 
-                 categories={categories}
-                 isLoading={isLoading}
-                 selectedCategory={selectedCategory}
-                 onSelect={setSelectedCategory}
-               />
-             </div>
-             <AnimatePresence mode="wait">
-               <motion.div
-                 key={`${selectedCategory}-${currentVideo.title}`}
-                 className="space-y-6 px-4"
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 exit={{ opacity: 0, y: -20 }}
-                 transition={{ duration: 0.2 }}
-               >
-                 {relatedVideos.map((video, idx) => (
-                   <motion.div
-                      key={`${video.title}-${idx}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                   >
-                     <RelatedVideoCard 
-                       video={{
-                         ...video,
-                         slug: video.slug || video.title,
-                         mediaUrl: '', // Add missing required fields if any
-                         categorySlug: video.categorySlug || 'all'
-                       } as Video}
-                       onClick={() => handleRelatedClick(video)}
-                     />
-                   </motion.div>
-                 ))}
-               </motion.div>
-             </AnimatePresence>
+                     </motion.div>
+                   ))}
+                 </motion.div>
+               </AnimatePresence>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

@@ -42,6 +42,7 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({
               hidden: { opacity: 0, x: -10 },
               visible: { opacity: 1, x: 0 },
             }}
+            whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.3 }}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
               category === selectedCategory

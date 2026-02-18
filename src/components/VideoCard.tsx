@@ -1,4 +1,4 @@
-import React from 'react';
+import { motion } from 'motion/react';
 
 export interface VideoCardProps {
   thumbnailUrl: string;
@@ -24,7 +24,12 @@ const VideoCard: React.FC<VideoCardProps> = ({
   onClick,
 }) => {
   return (
-    <div className="mb-6 group cursor-pointer" onClick={onClick}>
+    <motion.div 
+      className="mb-6 group cursor-pointer" 
+      onClick={onClick}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+    >
       <div className="relative w-full aspect-video bg-surface-dark overflow-hidden">
         <img
           alt={title}
@@ -55,7 +60,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
           <span className="material-symbols-outlined text-xl">more_vert</span>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
