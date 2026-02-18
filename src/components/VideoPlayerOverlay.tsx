@@ -212,12 +212,6 @@ const VideoPlayerOverlay: React.FC = () => {
       style={{ flexDirection: viewMode === 'mini' ? 'row' : 'column' }}
     >
       
-      {/* Drag Handle (Full Screen Only) */}
-      {viewMode === 'full' && (
-        <div className="absolute top-0 left-0 right-0 z-50 flex justify-center pt-3 pb-4 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
-          <div className="h-1.5 w-12 rounded-full bg-white/30 backdrop-blur-sm"></div>
-        </div>
-      )}
 
       {/* Video Player Section */}
       <div className={`relative shrink-0 overflow-hidden bg-black transition-all duration-300 ${
