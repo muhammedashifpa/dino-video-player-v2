@@ -17,7 +17,11 @@ const VideoPlayerOverlay: React.FC = () => {
     minimize, 
     close,
     play, 
-    pause 
+    pause,
+    progress,
+    duration,
+    setProgress,
+    setDuration
   } = usePlayerStore();
 
   const { categories, selectedCategory, setSelectedCategory, filteredVideos, isLoading } = useVideoFeed(true);
@@ -28,9 +32,37 @@ const VideoPlayerOverlay: React.FC = () => {
     }
   }, [currentVideo, categories, setSelectedCategory]);
 
+  // Simulate playback
+  React.useEffect(() => {
+    if (status === 'playing') {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= duration) {
+            pause();
+            return duration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [status, duration, pause, setProgress]);
+
+  // Set initial duration when video loads
+  React.useEffect(() => {
+    if (currentVideo) {
+      setDuration(600); // Mock duration 10:00
+      setProgress(0);
+    }
+  }, [currentVideo, setDuration, setProgress]);
+
   if (viewMode === 'hidden' || !currentVideo) return null;
 
   const isPlaying = status === 'playing';
+
+  const handleSeek = (newTime: number) => {
+    setProgress(newTime);
+  };
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -38,6 +70,14 @@ const VideoPlayerOverlay: React.FC = () => {
     } else {
       if (currentVideo) play(currentVideo);
     }
+  };
+
+  const handleSkipForward = () => {
+    setProgress((prev) => Math.min(prev + 10, duration));
+  };
+
+  const handleSkipBackward = () => {
+    setProgress((prev) => Math.max(0, prev - 10));
   };
 
   // Filter related videos (exclude current video from the already filtered list)
@@ -57,9 +97,6 @@ const VideoPlayerOverlay: React.FC = () => {
     });
   };
 
-  // Mock progress and duration for now
-  const progress = 262; // 04:22
-  const duration = 600; // 10:00
 
   // Generate stable likes
   const likeCount = currentVideo ? getStableLikes(currentVideo.title) : 0;
@@ -145,8 +182,9 @@ const VideoPlayerOverlay: React.FC = () => {
             progress={progress}
             duration={duration}
             onPlayPause={handlePlayPause}
-            onSkipForward={() => {}} 
-            onSkipBackward={() => {}}
+            onSkipForward={handleSkipForward} 
+            onSkipBackward={handleSkipBackward}
+            onSeek={handleSeek}
             onMinimize={minimize}
             onClose={close}
           />

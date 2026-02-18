@@ -34,7 +34,7 @@ const ChannelAvatar: React.FC<ChannelAvatarProps> = ({
   }
 
   return (
-    <div className={`${sizeClasses[size]} rounded-full bg-primary/20 flex-shrink-0 border border-primary/30 overflow-hidden`}>
+    <div className={`${sizeClasses[size]} rounded-full bg-primary/20 shrink-0 border border-primary/30 overflow-hidden`}>
       <img
         alt={name}
         className="w-full h-full object-cover"

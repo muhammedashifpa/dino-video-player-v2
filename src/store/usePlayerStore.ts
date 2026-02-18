@@ -30,6 +30,8 @@ interface PlayerState {
   close: () => void;
   setVideo: (video: Video) => void;
   toggleMute: () => void;
+  setProgress: (progress: number | ((prev: number) => number)) => void;
+  setDuration: (duration: number) => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set) => ({
@@ -64,4 +66,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setVideo: (video) => set({ currentVideo: video }),
   
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+  setProgress: (progress) => set((state) => ({ 
+    progress: typeof progress === 'function' ? progress(state.progress) : progress 
+  })),
+  setDuration: (duration) => set({ duration }),
 }));

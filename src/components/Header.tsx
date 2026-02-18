@@ -16,9 +16,7 @@ const Header: React.FC = () => {
         </h1>
       </div>
       <div className="flex gap-4">
-        <button className="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">cast</span>
-        </button>
+
         <button className="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
           <span className="material-symbols-outlined">notifications</span>
         </button>

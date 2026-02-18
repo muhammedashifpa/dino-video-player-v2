@@ -5,7 +5,7 @@ const SkeletonCategoryPills: React.FC = () => {
     <div
       className="flex gap-2 p-3 overflow-x-hidden whitespace-nowrap z-20"
     >
-      {[60, 80, 70, 90, 65, 75].map((width, index) => (
+      {[140, 240, 180, 245, 170].map((width, index) => (
         <div
           key={index}
           className="h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse"

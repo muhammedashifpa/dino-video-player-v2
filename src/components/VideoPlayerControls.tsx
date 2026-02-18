@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface VideoPlayerControlsProps {
   isPlaying: boolean;
@@ -7,6 +7,7 @@ interface VideoPlayerControlsProps {
   onPlayPause: () => void;
   onSkipForward: () => void;
   onSkipBackward: () => void;
+  onSeek: (time: number) => void;
   onMinimize: () => void;
   onClose: () => void;
 }
@@ -24,9 +25,27 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
   onPlayPause,
   onSkipForward,
   onSkipBackward,
+  onSeek,
   onMinimize,
   onClose,
 }) => {
+  const [isSkippingForward, setIsSkippingForward] = useState(false);
+  const [isSkippingBackward, setIsSkippingBackward] = useState(false);
+
+  const handleSkipForwardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSkippingForward(true);
+    onSkipForward();
+    setTimeout(() => setIsSkippingForward(false), 200);
+  };
+
+  const handleSkipBackwardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSkippingBackward(true);
+    onSkipBackward();
+    setTimeout(() => setIsSkippingBackward(false), 200);
+  };
+
   return (
     <div className="absolute inset-0 flex flex-col justify-between bg-black/30 p-4 transition-opacity duration-300">
       {/* Top Controls (Minimize/Settings) */}
@@ -38,12 +57,7 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
           <span className="material-symbols-outlined text-xl">expand_more</span>
         </button>
         <div className="flex gap-4">
-          <button className="text-white hover:text-primary transition-colors">
-            <span className="material-symbols-outlined">cast</span>
-          </button>
-          <button className="text-white hover:text-primary transition-colors">
-            <span className="material-symbols-outlined">settings</span>
-          </button>
+
           <button 
              onClick={(e) => { e.stopPropagation(); onClose(); }}
              className="text-white hover:text-red-500 transition-colors"
@@ -56,8 +70,8 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
       {/* Center Controls (Play/Skip) */}
       <div className="flex items-center justify-center gap-12 text-white">
         <button 
-          onClick={(e) => { e.stopPropagation(); onSkipBackward(); }}
-          className="flex items-center justify-center transition-transform active:scale-90"
+          onClick={handleSkipBackwardClick}
+          className={`flex items-center justify-center transition-transform active:scale-90 ${isSkippingBackward ? 'scale-75 text-primary' : ''}`}
         >
           <span className="material-symbols-outlined text-4xl">replay_10</span>
         </button>
@@ -72,8 +86,8 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
         </button>
 
         <button 
-          onClick={(e) => { e.stopPropagation(); onSkipForward(); }}
-          className="flex items-center justify-center transition-transform active:scale-90"
+          onClick={handleSkipForwardClick}
+          className={`flex items-center justify-center transition-transform active:scale-90 ${isSkippingForward ? 'scale-75 text-primary' : ''}`}
         >
           <span className="material-symbols-outlined text-4xl">forward_10</span>
         </button>
@@ -81,17 +95,34 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
 
       {/* Bottom Progress Bar & Time */}
       <div className="flex flex-col gap-2">
-        <div className="relative h-1 w-full rounded-full bg-white/30 cursor-pointer group">
+        <div 
+          className="relative h-1 w-full rounded-full bg-white/30 cursor-pointer group touch-none"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            onSeek(Math.min(Math.max(0, percent * duration), duration));
+          }}
+        >
            {/* Progress bar background */}
           <div 
-            className="absolute top-0 left-0 h-full rounded-full bg-primary shadow-[0_0_10px_rgba(173,43,238,0.8)]"
+            className="absolute top-0 left-0 h-full rounded-full bg-primary shadow-[0_0_10px_rgba(173,43,238,0.8)] pointer-events-none"
             style={{ width: `${(progress / duration) * 100}%` }}
           ></div>
           {/* Thumb */}
           <div 
-            className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-primary border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-primary border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
             style={{ left: `${(progress / duration) * 100}%` }}
           ></div>
+          
+          {/* Interactive slider for drag support */}
+          <input
+            type="range"
+            min={0}
+            max={duration}
+            value={progress}
+            onChange={(e) => onSeek(Number(e.target.value))}
+            className="absolute inset-0 h-full w-full opacity-0 cursor-pointer"
+          />
         </div>
         
         <div className="flex items-center justify-between px-1 text-[10px] font-medium text-white/90">
