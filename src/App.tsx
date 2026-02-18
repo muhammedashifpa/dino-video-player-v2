@@ -51,7 +51,7 @@ function App() {
         }}
         animate={hidden ? 'hidden' : 'visible'}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="absolute top-0 left-0 w-full z-30 flex flex-col"
+        className="fixed top-0 left-0 w-full z-30 flex flex-col"
       >
         <Header />
         <CategoryPills 
@@ -61,7 +61,7 @@ function App() {
           onSelect={setSelectedCategory}
         />
       </motion.div>
-      <main ref={scrollRef} className="flex-1 overflow-y-auto pb-32 pt-[120px]">
+      <main className="flex-1 pb-32 pt-[120px]">
         {isLoading ? (
           // Render Skeletons in a grid or list
           Array.from({ length: 6 }).map((_, index) => (

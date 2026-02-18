@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, type PanInfo } from 'motion/react';
+import { motion, AnimatePresence, type PanInfo } from 'motion/react';
 import { usePlayerStore } from '../store/usePlayerStore';
 import VideoPlayerControls from './VideoPlayerControls';
 import { useVideoFeed } from '../hooks/useVideoFeed';
@@ -29,6 +29,18 @@ const VideoPlayerOverlay: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const { categories, selectedCategory, setSelectedCategory, filteredVideos, isLoading } = useVideoFeed(true);
+
+  // Lock body scroll when in full screen
+  useEffect(() => {
+    if (viewMode === 'full') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [viewMode]);
 
   React.useEffect(() => {
     if (currentVideo && categories.includes(currentVideo.channelName)) {
@@ -100,8 +112,6 @@ const VideoPlayerOverlay: React.FC = () => {
     };
   }, [status]);
 
-  if (viewMode === 'hidden' || !currentVideo) return null;
-
   const isPlaying = status === 'playing';
 
   const handleSeek = (newTime: number) => {
@@ -135,7 +145,7 @@ const VideoPlayerOverlay: React.FC = () => {
 
   // Filter related videos (exclude current video from the already filtered list)
   const relatedVideos = filteredVideos
-    .filter(v => v.title !== currentVideo.title)
+    .filter(v => v.title !== currentVideo?.title)
     .slice(0, 20);
 
   const handleRelatedClick = (video: VideoCardProps) => {
@@ -194,93 +204,106 @@ const VideoPlayerOverlay: React.FC = () => {
   };
 
   return (
-    <motion.div 
-      // layout
-      variants={overlayVariants}
-      initial="hidden"
-      animate={viewMode as string}
-      exit="hidden"
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      drag={viewMode === 'full' ? 'y' : undefined}
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={{ bottom: 0.2 }}
-      onDragEnd={handleDragEnd}
-      onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
-      onMouseMove={handleUserActivity}
-      onTouchStart={handleUserActivity}
-      className="absolute z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl "
-      style={{ flexDirection: viewMode === 'mini' ? 'row' : 'column' }}
-    >
-      
+    <AnimatePresence>
+      {(viewMode !== 'hidden' && currentVideo) && (
+        <motion.div 
+          key="video-overlay"
+          layout
+          variants={overlayVariants}
+          initial="hidden"
+          animate={viewMode as string}
+          exit="hidden"
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          drag={viewMode === 'full' ? 'y' : undefined}
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ bottom: 0.2 }}
+          onDragEnd={handleDragEnd}
+          onClick={() => viewMode === 'mini' && usePlayerStore.getState().maximize()}
+          onMouseMove={handleUserActivity}
+          onTouchStart={handleUserActivity}
+          className={`z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl ${
+            viewMode === 'full' ? 'fixed inset-0' : 'fixed'
+          }`}
+          style={{ 
+            flexDirection: viewMode === 'mini' ? 'row' : 'column',
+            left: viewMode === 'full' ? 0 : '',
+            right: viewMode === 'full' ? 0 : ''
+          }}
+        >
+          
 
-      {/* Video Player Section */}
-      <div className={`relative shrink-0 overflow-hidden bg-black transition-all duration-300 ${
-        viewMode === 'full' ? 'w-full aspect-video z-10' : 'h-full w-[120px] z-10'
-      }`}>
-        
-        {/* Main Video Player */}
-        <video
-          ref={videoRef}
-          src={currentVideo.mediaUrl}
-          poster={currentVideo.thumbnailUrl}
-          className="absolute inset-0 h-full w-full object-cover"
-          playsInline
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={handleVideoEnded}
-          onClick={handlePlayPause}
-        />
-
-        {/* Video Player Controls (Full Mode) */}
-        {viewMode === 'full' && (
-          <VideoPlayerControls 
-            isVisible={showControls}
-            isPlaying={isPlaying}
-            progress={progress}
-            duration={duration}
-            onPlayPause={handlePlayPause}
-            onSkipForward={handleSkipForward} 
-            onSkipBackward={handleSkipBackward}
-            onSeek={handleSeek}
-            onMinimize={minimize}
-            onClose={close}
-          />
-        )}
-      </div>
-
-      {/* Mini Player Info & Controls */}
-      {viewMode === 'mini' && (
-        <MiniPlayerView 
-          currentVideo={currentVideo}
-          isPlaying={isPlaying}
-          onPlayPause={handlePlayPause}
-          onClose={close}
-        />
-      )}
-
-      {/* Metadata & Related Videos (Hidden in Mini Mode) */}
-      {viewMode === 'full' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-background-dark">
-          <div className="flex-1 overflow-y-auto scrollbar-none pb-24">
+          {/* Video Player Section */}
+          <motion.div 
+            layout
+            className={`relative shrink-0 overflow-hidden bg-black z-10 ${
+            viewMode === 'full' ? 'w-full aspect-video' : 'h-full w-[120px]'
+          }`}>
             
-            <OverlayMetadata 
-              currentVideo={currentVideo} 
-              likeCount={likeCount} 
+            {/* Main Video Player */}
+            <video
+              ref={videoRef}
+              src={currentVideo.mediaUrl}
+              poster={currentVideo.thumbnailUrl}
+              className="absolute inset-0 h-full w-full object-cover"
+              playsInline
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onEnded={handleVideoEnded}
+              onClick={handlePlayPause}
             />
 
-            <RelatedVideosList 
+            {/* Video Player Controls (Full Mode) */}
+            {viewMode === 'full' && (
+              <VideoPlayerControls 
+                isVisible={showControls}
+                isPlaying={isPlaying}
+                progress={progress}
+                duration={duration}
+                onPlayPause={handlePlayPause}
+                onSkipForward={handleSkipForward} 
+                onSkipBackward={handleSkipBackward}
+                onSeek={handleSeek}
+                onMinimize={minimize}
+                onClose={close}
+              />
+            )}
+          </motion.div>
+
+          {/* Mini Player Info & Controls */}
+          {viewMode === 'mini' && (
+            <MiniPlayerView 
               currentVideo={currentVideo}
-              relatedVideos={relatedVideos}
-              categories={categories}
-              selectedCategory={selectedCategory}
-              isLoading={isLoading}
-              onSelectCategory={setSelectedCategory}
-              onVideoClick={handleRelatedClick}
+              isPlaying={isPlaying}
+              onPlayPause={handlePlayPause}
+              onClose={close}
             />
-          </div>
-        </div>
+          )}
+
+          {/* Metadata & Related Videos (Hidden in Mini Mode) */}
+          {viewMode === 'full' && (
+            <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-background-dark">
+              <div className="flex-1 overflow-y-auto scrollbar-none pb-24">
+                
+                <OverlayMetadata 
+                  currentVideo={currentVideo} 
+                  likeCount={likeCount} 
+                />
+
+                <RelatedVideosList 
+                  currentVideo={currentVideo}
+                  relatedVideos={relatedVideos}
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  isLoading={isLoading}
+                  onSelectCategory={setSelectedCategory}
+                  onVideoClick={handleRelatedClick}
+                />
+              </div>
+            </div>
+          )}
+        </motion.div>
       )}
-    </motion.div>
+    </AnimatePresence>
   );
 };
 

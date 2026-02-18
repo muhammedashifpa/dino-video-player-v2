@@ -7,6 +7,8 @@
 html, body {
   /* Remove fixed height to allow document scrolling */
   touch-action: manipulation;
+  background-color: #120a16; /* Match --color-background-dark */
+  color: white;
 }
 
 #root {
