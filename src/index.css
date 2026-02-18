@@ -2,6 +2,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 @import "tailwindcss";
+@import "tailwindcss/utilities";
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none; /* Disable double-tap zoom */
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
 
 @theme {
   --font-display: "Space Grotesk", sans-serif;
