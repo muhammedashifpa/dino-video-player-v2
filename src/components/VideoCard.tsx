@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import ChannelAvatar from './ui/ChannelAvatar';
 
 export interface VideoCardProps {
   thumbnailUrl: string;
@@ -41,13 +42,10 @@ const VideoCard: React.FC<VideoCardProps> = ({
         </span>
       </div>
       <div className="flex gap-3 p-3">
-        <div className="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0 border border-primary/30 overflow-hidden">
-          <img
-            alt={channelName}
-            className="w-full h-full object-cover"
-            src={channelAvatarUrl}
-          />
-        </div>
+        <ChannelAvatar 
+          src={channelAvatarUrl} 
+          name={channelName} 
+        />
         <div className="flex flex-col flex-1">
           <h3 className="text-sm font-bold leading-tight text-slate-900 dark:text-white line-clamp-2">
             {title}

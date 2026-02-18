@@ -44,10 +44,10 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({
             }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               category === selectedCategory
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-black border-transparent'
-                : 'bg-gray-100 text-slate-700 border-gray-200 hover:bg-gray-200 dark:bg-surface-dark dark:text-slate-300 dark:border-border-dark dark:hover:bg-surface-dark/80 dark:hover:text-white'
+                ? 'bg-primary text-white'
+                : 'bg-black/5 text-slate-700 hover:bg-black/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/20'
             }`}
           >
             {category}
