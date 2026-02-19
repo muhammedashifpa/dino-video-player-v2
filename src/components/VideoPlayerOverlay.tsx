@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, type PanInfo } from 'motion/react';
+import { motion, AnimatePresence, type PanInfo, useMotionValue, useTransform } from 'motion/react';
 import { usePlayerStore } from '../store/usePlayerStore';
 import VideoPlayerControls from './VideoPlayerControls';
 import { useVideoFeed } from '../hooks/useVideoFeed';
@@ -30,6 +30,9 @@ const VideoPlayerOverlay: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const { categories, selectedCategory, setSelectedCategory, filteredVideos, isLoading } = useVideoFeed(true);
+  
+  const y = useMotionValue(0);
+  const opacity = useTransform(y, [0, 200], [1, 0.5]);
 
   // Lock body scroll when in full screen
   useEffect(() => {
@@ -176,7 +179,9 @@ const VideoPlayerOverlay: React.FC = () => {
     hidden: { 
       y: '100%', 
       opacity: 0,
-      pointerEvents: 'none' as const
+      pointerEvents: 'none' as const,
+      top: 'auto',
+      bottom: 0
     },
     full: { 
       y: 0, 
@@ -189,7 +194,8 @@ const VideoPlayerOverlay: React.FC = () => {
       // Explicitly set width to avoid layout thrashing
       width: '100%',
       borderRadius: 0,
-      pointerEvents: 'auto' as const
+      pointerEvents: 'auto' as const,
+      top: 'auto'
     },
     mini: { 
       y: 0, 
@@ -200,7 +206,8 @@ const VideoPlayerOverlay: React.FC = () => {
       height: 80,
       width: 'calc(100% - 24px)',
       borderRadius: 12,
-      pointerEvents: 'auto' as const
+      pointerEvents: 'auto' as const,
+      top: 'auto'
     }
   };
 
@@ -215,31 +222,29 @@ const VideoPlayerOverlay: React.FC = () => {
           animate={viewMode as string}
           exit="hidden"
           transition={{ type: 'spring', damping: 25, stiffness: 200,  }}
-          drag={viewMode === 'full' ? 'y' : undefined}
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={{ bottom: 0.5 }}
-          onDragEnd={handleDragEnd}
           whileTap={{ scale: viewMode === 'mini' ? 0.9 : 1, }}
           // whileDrag={{scaleY:0.9, scaleX:0.9 , borderRadius:15}}
           whileHover={{ scale: viewMode === 'mini' ? 1.02 : 1 }}
           onClick={() => viewMode === 'mini' && maximize()}
           onMouseMove={handleUserActivity}
           onTouchStart={handleUserActivity}
-          className={`z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl ${
-            viewMode === 'full' ? 'fixed inset-0' : 'fixed'
-          }`}
+          className={`z-50 flex overflow-hidden bg-white dark:bg-background-dark text-slate-900 dark:text-white shadow-2xl fixed`}
           style={{ 
             flexDirection: viewMode === 'mini' ? 'row' : 'column',
-            left: viewMode === 'full' ? 0 : '',
-            right: viewMode === 'full' ? 0 : ''
+            opacity
           }}
         >
           
 
           {/* Video Player Section */}
           <motion.div 
+            style={{ y }}
+            drag={viewMode === 'full' ? "y" : undefined}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ bottom: 0.5 }}
+            onDragEnd={handleDragEnd}
             layout
-            className={`relative shrink-0 overflow-hidden bg-black z-10 ${
+            className={`relative shrink-0 overflow-hidden bg-black z-50 ${
             viewMode === 'full' ? 'w-full aspect-video' : 'h-full w-[120px]'
           }`}>
             
