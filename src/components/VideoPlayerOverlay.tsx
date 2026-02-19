@@ -154,10 +154,10 @@ const VideoPlayerOverlay: React.FC = () => {
         slug: video.slug || video.title,
         title: video.title,
         thumbnailUrl: video.thumbnailUrl,
-        mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        mediaUrl: video.mediaUrl || '',
         channelName: video.channelName,
         channelAvatarUrl: video.channelAvatarUrl,
-        categorySlug: video.categorySlug || 'all' 
+        categorySlug: video.categorySlug || 'all'
     });
   };
 
@@ -220,7 +220,7 @@ const VideoPlayerOverlay: React.FC = () => {
           dragElastic={{ bottom: 0.5 }}
           onDragEnd={handleDragEnd}
           whileTap={{ scale: viewMode === 'mini' ? 0.9 : 1, }}
-          whileDrag={{scaleY:0.9, scaleX:0.9 , borderRadius:15}}
+          // whileDrag={{scaleY:0.9, scaleX:0.9 , borderRadius:15}}
           whileHover={{ scale: viewMode === 'mini' ? 1.02 : 1 }}
           onClick={() => viewMode === 'mini' && maximize()}
           onMouseMove={handleUserActivity}

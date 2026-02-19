@@ -32,9 +32,7 @@ function App() {
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
       // Fallback to sample video for YouTube links since <video> tag doesn't support them
-      mediaUrl: video.mediaUrl && !video.mediaUrl.includes('youtube') 
-        ? video.mediaUrl 
-        : 'https://www.w3schools.com/html/mov_bbb.mp4',
+      mediaUrl: video.mediaUrl || '',
       channelName: video.channelName,
       channelAvatarUrl: video.channelAvatarUrl,
       categorySlug: video.categorySlug || 'all'

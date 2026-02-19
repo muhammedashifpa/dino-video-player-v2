@@ -49,14 +49,14 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
   };
 
   return (
-    <div className={`absolute inset-0 flex flex-col justify-between bg-black/30 p-4 transition-opacity duration-300 ${
+    <div className={`absolute inset-0 flex flex-col justify-between bg-black/30 transition-opacity duration-300 ${
       isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
     }`}>
       {/* Top Controls (Minimize/Settings) */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between p-4 bg-linear-to-b from-black/60 to-transparent">
         <button 
           onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-          className="flex items-center justify-center rounded-full bg-black/40 p-1.5 text-white"
+          className="flex items-center justify-center rounded-full bg-black/40 p-1.5 text-white backdrop-blur-sm"
         >
           <span className="material-symbols-outlined text-xl">expand_more</span>
         </button>
@@ -72,10 +72,10 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
       </div>
 
       {/* Center Controls (Play/Skip) */}
-      <div className="flex items-center justify-center gap-12 text-white">
+      <div className="flex-1 flex items-center justify-center gap-12 text-white">
         <button 
           onClick={handleSkipBackwardClick}
-          className={`flex items-center justify-center transition-transform active:scale-90 ${isSkippingBackward ? 'scale-75 text-primary' : ''}`}
+          className={`flex items-center justify-center transition-transform active:scale-90 bg-black/20 rounded-full p-3 backdrop-blur-sm ${isSkippingBackward ? 'scale-75 text-primary' : ''}`}
         >
           <span className="material-symbols-outlined text-4xl">replay_10</span>
         </button>
@@ -91,16 +91,25 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
 
         <button 
           onClick={handleSkipForwardClick}
-          className={`flex items-center justify-center transition-transform active:scale-90 ${isSkippingForward ? 'scale-75 text-primary' : ''}`}
+          className={`flex items-center justify-center transition-transform active:scale-90 bg-black/20 rounded-full p-3 backdrop-blur-sm ${isSkippingForward ? 'scale-75 text-primary' : ''}`}
         >
           <span className="material-symbols-outlined text-4xl">forward_10</span>
         </button>
       </div>
 
       {/* Bottom Progress Bar & Time */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col w-full bg-linear-to-t from-black/60 to-transparent pt-8">
+        <div className="flex items-center justify-between px-4 pb-3 text-[12px] font-medium text-white/90">
+          <div className="flex gap-1.5">
+            <span>{formatTime(progress)}</span>
+            <span className="text-white/50">/</span>
+            <span className="text-white/70">{formatTime(duration)}</span>
+          </div>
+          {/* Add Fullscreen toggle here later if needed */}
+        </div>
+
         <div 
-          className="relative h-1 w-full rounded-full bg-white/30 cursor-pointer group touch-none"
+          className="relative h-1 w-full cursor-pointer group touch-none bg-white/30 hover:h-1.5 transition-all duration-200"
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
             const percent = (e.clientX - rect.left) / rect.width;
@@ -109,12 +118,12 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
         >
            {/* Progress bar background */}
           <div 
-            className="absolute top-0 left-0 h-full rounded-full bg-primary shadow-[0_0_10px_rgba(173,43,238,0.8)] pointer-events-none"
+            className="absolute top-0 left-0 h-full bg-primary shadow-[0_0_10px_rgba(173,43,238,0.5)] pointer-events-none"
             style={{ width: `${(progress / duration) * 100}%` }}
           ></div>
           {/* Thumb */}
           <div 
-            className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-primary border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+            className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 -translate-x-1/2 rounded-full bg-primary border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md"
             style={{ left: `${(progress / duration) * 100}%` }}
           ></div>
           
@@ -127,11 +136,6 @@ const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
             onChange={(e) => onSeek(Number(e.target.value))}
             className="absolute inset-0 h-full w-full opacity-0 cursor-pointer"
           />
-        </div>
-        
-        <div className="flex items-center justify-between px-1 text-[10px] font-medium text-white/90">
-          <span>{formatTime(progress)}</span>
-          <span>{formatTime(duration)}</span>
         </div>
       </div>
     </div>
