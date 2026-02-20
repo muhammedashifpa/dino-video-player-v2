@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, type PanInfo, useMotionValue, useTransform } from 'motion/react';
 import { usePlayerStore } from '../../store/usePlayerStore';
-import { useVideoFeed } from '../../hooks/useVideoFeed';
 import VerticalFullPlayerView from './VerticalFullPlayerView';
 import VerticalMiniPlayerView from './VerticalMiniPlayerView';
+import VerticalVideoDrawer from './VerticalVideoDrawer';
 
 const VerticalVideoPlayerOverlay: React.FC = () => {
   const { 
@@ -32,7 +32,6 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const seekerRef = useRef<HTMLDivElement>(null);
   
   
-  const { filteredVideos } = useVideoFeed(true);
   
   // Drag and animation values
   const y = useMotionValue(0);
@@ -336,94 +335,10 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
             {/* Layer 2: Drawer System (Swipe Zone & Drawer Sheet) */}
             <div className="absolute inset-0 w-full h-full z-40 pointer-events-none">
-              {/* Drawer Sheet */}
-              <AnimatePresence>
-                {showDrawer && (
-                  <>
-                    {/* Backdrop for click outside to close */}
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => setShowDrawer(false)}
-                      className="absolute inset-0 bg-black/40 backdrop-blur-md pointer-events-auto cursor-pointer"
-                    />
-
-                    <motion.div 
-                      initial={{ y: '100%' }}
-                      animate={{ y: 0 }}
-                      exit={{ y: '100%' }}
-                      drag="y"
-                      dragConstraints={{ top: 0, bottom: 800 }}
-                      dragElastic={0.1}
-                      dragPropagation={false}
-                      onDragEnd={(_, info) => {
-                        if (info.offset.y > 150) {
-                          setShowDrawer(false);
-                        }
-                      }}
-                      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                      className="absolute bottom-0 left-0 w-full h-[65%] bg-surface-dark/95 backdrop-blur-xl pointer-events-auto rounded-t-[32px] border-t border-white/10 flex flex-col touch-none"
-                    >
-                    <div 
-                      className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-6 cursor-pointer"
-                      onClick={() => setShowDrawer(false)}
-                    />
-                    
-                    {/* Category Filter */}
-                    <div className="px-6 mb-6 overflow-x-auto scrollbar-none">
-                      <div className="flex gap-2 whitespace-nowrap">
-                        {['All', 'Tech', 'AI', 'Design'].map((cat) => (
-                          <button 
-                            key={cat}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors ${
-                              cat === 'All' 
-                                ? 'bg-primary text-white border-primary' 
-                                : 'bg-white/5 text-white/60 border-white/10'
-                            }`}
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* List */}
-                    <div className="flex-1 overflow-y-auto px-6 space-y-4 pb-20 scrollbar-none">
-                      {filteredVideos.map((video, idx) => (
-                        <div 
-                          key={idx}
-                          onClick={() => {
-                            play({
-                              slug: video.slug || video.title,
-                              title: video.title,
-                              thumbnailUrl: video.thumbnailUrl,
-                              mediaUrl: video.mediaUrl || '',
-                              channelName: video.channelName,
-                              channelAvatarUrl: video.channelAvatarUrl,
-                              categorySlug: video.categorySlug || 'all',
-                              categoryName: video.categoryName || 'Tech'
-                            });
-                            setShowDrawer(false);
-                          }}
-                          className="flex gap-4 items-center p-2 rounded-2xl hover:bg-white/5 transition-colors cursor-pointer"
-                        >
-                          <div className="w-24 h-16 rounded-xl overflow-hidden bg-black/40 border border-white/5 shrink-0">
-                            <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-bold text-white truncate">{video.title}</h4>
-                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest mt-1">
-                              {video.categorySlug || 'Tech'}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+              <VerticalVideoDrawer 
+                showDrawer={showDrawer}
+                setShowDrawer={setShowDrawer}
+              />
             </div>
           </div>
         )}

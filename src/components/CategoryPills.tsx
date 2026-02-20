@@ -6,13 +6,15 @@ interface CategoryPillsProps {
   isLoading?: boolean;
   selectedCategory?: string;
   onSelect?: (category: string) => void;
+  containerClassName?: string;
 }
 
 const CategoryPills: React.FC<CategoryPillsProps> = ({ 
   categories = [], 
   isLoading = false, 
   selectedCategory = 'All', 
-  onSelect 
+  onSelect,
+  containerClassName
 }) => {
   if (isLoading) {
     return <SkeletonCategoryPills />;
@@ -20,7 +22,7 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({
 
   return (
     <div
-      className="flex gap-2 p-3 overflow-x-auto whitespace-nowrap bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-20 scrollbar-none"
+      className={containerClassName || "flex gap-2 p-3 overflow-x-auto whitespace-nowrap bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-20 scrollbar-none"}
     >
       <motion.div
         className="flex gap-2"
