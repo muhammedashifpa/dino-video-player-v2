@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import CategoryTag from './CategoryTag';
 
 
 export interface VideoCardProps {
@@ -9,8 +10,9 @@ export interface VideoCardProps {
   channelName: string;
   views: string;
   uploadedAt: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   categorySlug?: string;
+  categoryName?: string;
   slug?: string;
   mediaUrl?: string;
 }
@@ -44,9 +46,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
         <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
           {title}
         </h3>
-        <span className="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">
-          {categorySlug}
-        </span>
+        <CategoryTag label={categorySlug} className="mt-1" />
       </div>
     </motion.div>
   );

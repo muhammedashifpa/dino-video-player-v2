@@ -8,7 +8,7 @@ import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
 import { usePlayerStore } from './store/usePlayerStore';
-import VideoPlayerOverlay from './components/VideoPlayerOverlay';
+import VerticalVideoPlayerOverlay from './components/VerticalVideoPlayerOverlay';
 
 function App() {
   const scrollRef = useRef<HTMLElement>(null);
@@ -24,24 +24,30 @@ function App() {
 
   const hidden = useScrollVisibility(scrollRef);
 
-  const handleVideoClick = (video: VideoCardProps) => {
-    // Transform video data to match store Video type
-    // In a real app, types should be consistent
+  const handleVideoClick = (video: VideoCardProps, e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const originRect = {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height
+    };
+
     play({
-      slug: video.slug || video.title, // Use slug if available
+      slug: video.slug || video.title,
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
-      // Fallback to sample video for YouTube links since <video> tag doesn't support them
       mediaUrl: video.mediaUrl || '',
       channelName: video.channelName,
       channelAvatarUrl: video.channelAvatarUrl,
-      categorySlug: video.categorySlug || 'all'
-    });
+      categorySlug: video.categorySlug || 'all',
+      categoryName: video.categoryName || 'Artificial Intelligence'
+    }, originRect);
   };
 
   return (
     <Layout>
-      <VideoPlayerOverlay />
+      <VerticalVideoPlayerOverlay />
       <motion.div
         variants={{
           visible: { y: 0 },
@@ -105,7 +111,7 @@ function App() {
                   }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
-                  <VideoCard {...video} onClick={() => handleVideoClick(video)} />
+                  <VideoCard {...video} onClick={(e) => handleVideoClick(video, e)} />
                 </motion.div>
               ))}
             </motion.div>
