@@ -62,9 +62,11 @@ function App() {
       <main className="flex-1 pb-32 pt-[120px]">
         {isLoading ? (
           // Render Skeletons in a grid or list
-          Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonVideoCard key={index} />
-          ))
+          <div className="grid grid-cols-2 gap-4 px-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonVideoCard key={index} />
+            ))}
+          </div>
         ) : (
           // Render Actual Videos
           <AnimatePresence mode="wait">
@@ -73,12 +75,14 @@ function App() {
               initial="hidden"
               animate="visible"
               exit="exit"
+              className="grid grid-cols-2 gap-4 px-4"
               variants={{
                 hidden: { opacity: 0 },
                 visible: {
                   opacity: 1,
                   transition: {
                     duration: 0.3,
+                    staggerChildren: 0.05
                   },
                 },
                 exit: {

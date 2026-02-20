@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dino Player Vertical Home Feed v2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ad2bee",
+                        "accent-blue": "#2bdeee",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0a050c",
+                        "surface-dark": "#1c1022",
+                        "card-dark": "#25162d",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Space Grotesk", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto bg-background-light dark:bg-background-dark overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-3 border-b border-primary/10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(173,43,238,0.4)]">
+<span class="material-symbols-outlined text-white text-2xl">pets</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Dino Player</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">search</span>
+</button>
+<div class="size-9 rounded-full border-2 border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar male" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ8VTIVRcCre3ZTWUvPYQ3dd9BSr-GH36ek-M8L-m042cXkqS8JlEiFsBvkkmp_QKyAZ0HZLmz7H7FbUrSnR6Mc46rciBelG8W3m3kCl5UBugE-FSPK1UCHI9wqytu-j01ZmENKX2XQJlLoLkS_sYubLDDbSMfFoWEyCAtXWuWvEnQ1bn3i-sRP3XnDawjWb8fu93YtIdoZjpHOJtXAsOoMnq9PYZYlaupZDiLPybezHc1vSfdbhufsO9qijn-1w8zAqo8HAc6_gQ3"/>
+</div>
+</div>
+</header>
+<!-- Category Horizontal Scroll -->
+<div class="flex gap-2 px-4 py-4 overflow-x-auto hide-scrollbar whitespace-nowrap">
+<button class="px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold shadow-lg shadow-primary/20">
+                For You
+            </button>
+<button class="px-5 py-2 rounded-full bg-primary/10 dark:bg-surface-dark border border-primary/20 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-primary/20 transition-colors">
+                Gaming
+            </button>
+<button class="px-5 py-2 rounded-full bg-primary/10 dark:bg-surface-dark border border-primary/20 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-primary/20 transition-colors">
+                Music
+            </button>
+<button class="px-5 py-2 rounded-full bg-primary/10 dark:bg-surface-dark border border-primary/20 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-primary/20 transition-colors">
+                Tech
+            </button>
+<button class="px-5 py-2 rounded-full bg-primary/10 dark:bg-surface-dark border border-primary/20 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-primary/20 transition-colors">
+                Action
+            </button>
+</div>
+<!-- Dense Grid Feed -->
+<main class="flex-1 px-4 pb-24">
+<div class="masonry-grid">
+<!-- Card 1 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Neon abstract synthwave colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIakACAC_Ckld1kS-sW1458Mgn9Ff4Mk5Iw8FIoWU4Gep9IyzeJDjEkECt10eGj6rQIyonPrOS1VN2KqwEQIH4pK4NR3jVF1s-4nWJpvFwOCTChV6xWkhE27DKYZ8Qrfs4JXXsyL9dm--2muc3R78UHvUp_cybZIFOBEH6z0FZkLVOrdz9_fd5itaNxuAF5tlSKRPWKSZPhTxFcHpqApbOfE8azMSTXYjhOc2U1KBrByTbHh93RkYJ6ayXGWGVRVuaQ7lFHuHppTPf"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            0:15
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="absolute bottom-2 left-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-accent-blue text-sm">bolt</span>
+<span class="text-[10px] font-bold text-accent-blue uppercase tracking-tighter">Live Now</span>
+</div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Insane Dino Jump! Impossible Levels</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Action</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Retro gaming setup with neon lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBajNcie5JCp4u5yqR4Au3BK8GgurVVt19pMpHRHllczEgP66Ol8nLi50SRWC-LWq_oaLMJtuEQEGAnY5lvn8ViRU3P73LeFhDNsUjkNcXpcsn8W6lhjyPY3a7FzGBX-YTD1TtZWF9XSsW1fpLVU2f_W8gZLNVvmq0L7_3d4-CC5F35ktvvafLLxQRU_FIqwSg5m632-TPLBj1N40dkt4CtTix35ArdHPD7f_vtGHL7M1CxELdTd5K6J7Qc1ElMLMhLQdn7dW1FWxTf"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            1:02
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Lo-fi Beats for 24h Gaming Session</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Gaming</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Professional tech desk setup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMFTxXQvSosYI8H8XctC8N7Yv-Vj8k5tVRB1B5Fj4UEvq_HybbrqZIkPgeKOrE1aZKQVHoK09-6ATElvz5QNkOkp4aL90y6fFMW-q-doZOr4WGMAM8_dSAzcC-DqYFdoXeulNqoq_4NPcOd88RIMFYPR71WrKTbjCjbaSmzEoDEi42yy3eVUgaZf0Nwrn1bgZfUWL8Nd9DtPKWDIJJIdiBI6iiXkU0O0TVcR_Z2KRmG-6DOZxPDU9T_C-PIN9gAATMYx2URW-5gEQn"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            0:45
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Speedrun Tutorial: Any% World Record</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Educational</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Neon city streets at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAywAzWee29MhI_bjbyB8I8LEKPQWAb-fk0gGN9s5eOtb6ykpJbT3bjjAqlcEJmXGbKXnn3aJFmqKxKMyQgGMzazOhqr6PY6gwFo8dKJO9rBUSoX3dmfqVSkN74LiNEsGhifA_yeZKJYEWZ52qfcvZ627OLg9pEdTP1VYAiLg2GEW5ZS1qxxicBUps769JPQw-C3PqlMZrBoW4XTTdTwf3964jWf_-wBoiUP7F3OBxjS4Ivf1_kGkEn1JioWJ9Qn7UK1sMYb8r3WlZ"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            3:20
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Neon City Night: Visualizer 4K</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Music</span>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Epic fantasy landscape gaming art" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHpM5OY1WBNFLmK9BbIavPLFumfnNr5keAUOVsnMehEhD81RPtCfoySyNlzoRsLtH_beTBIha8Pime03BQQZrNGuiGoKMWUMUTWKw3chFC0hid2yu6sGN36h6Zv1YQq_s_9-t2IpVf2IPqbwNfMqRl1nCNHX5J9Xnrjs-8HM1O_MWi0VFK7DS-96oK98bBPGQQriywiMA_pWo2Q2gCBY3zFlm8oD8FN1tq_qOQg0cYxm1-ME6ZAYuzOj4YeSE1f3D9Xz0TN79tFd0v"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            1:15
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Epic Boss Fight: T-Rex Unbound</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Gaming</span>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="flex flex-col gap-2 group">
+<div class="relative aspect-[9/16] w-full rounded-2xl overflow-hidden bg-card-dark shadow-xl ring-1 ring-white/5 transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="Bright colorful vlog aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMP8Dy3cdgIlueXmGwa3w82NdBZadmKZH2qknpwXeIlTT3HZN66fITMQv5NhBerYdovHgS4YKGSf93VKotlutmnOcl1ZKse3TO3rUplCJdpkRvHgG4h8E87eX2yFyX4qLwmfieEDdhxNaxDYqmuw6X2wZEKK1qD--xsLKJG7R93ETnVpeqDx1fLiyHChzia-YuJdkTrFQmY3ZcKHx7SDx-2NOA-tgbYHAN-RHpakjVu8OmllPfSx0C0LcAVoTybdryxrkUC8LwUEev"/>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                            0:58
+                        </div>
+<div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="px-1">
+<p class="text-sm font-semibold leading-snug line-clamp-2 text-slate-900 dark:text-slate-100">Dino Vlogs #22: Behind the Scenes</p>
+<span class="inline-block mt-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Vlog</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Optional but fits design) -->
+<div class="fixed bottom-24 right-6 z-50">
+<button class="size-14 rounded-full bg-primary text-white shadow-[0_0_20px_rgba(173,43,238,0.6)] flex items-center justify-center hover:scale-110 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 pb-6 pt-2 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-primary/10">
+<div class="flex items-center justify-around px-4">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">house</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Discover</span>
+</a>
+<div class="relative -top-4">
+<div class="size-12 rounded-2xl bg-gradient-to-br from-primary to-accent-blue rotate-45 flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-white -rotate-45 text-3xl font-bold">add</span>
+</div>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Inbox</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Library</span>
+</a>
+</div>
+<!-- iOS Indicator Mock -->
+<div class="mt-4 mx-auto w-32 h-1.5 bg-slate-300 dark:bg-slate-800 rounded-full"></div>
+</nav>
+</div>
+</body></html>
