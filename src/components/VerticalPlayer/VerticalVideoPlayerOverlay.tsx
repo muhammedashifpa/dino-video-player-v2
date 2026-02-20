@@ -29,6 +29,8 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const seekerRef = useRef<HTMLDivElement>(null);
+  
   
   const { filteredVideos } = useVideoFeed(true);
   
@@ -155,8 +157,8 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     }
   };
 
-  const handleSeek = (e: React.PointerEvent | React.MouseEvent) => {
-    const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+  const handleSeek = (e: React.PointerEvent | React.MouseEvent | PointerEvent) => {
+    const rect = seekerRef.current?.getBoundingClientRect();
     if (rect && videoRef.current) {
       const x = e.clientX - rect.left;
       const pct = Math.max(0, Math.min(1, x / rect.width));
@@ -182,6 +184,26 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const handlePointerUp = () => {
     setIsSeeking(false);
   };
+
+  // Global pointer tracking for smoother seeking
+  useEffect(() => {
+    if (isSeeking) {
+      const handleGlobalPointerMove = (e: PointerEvent) => {
+        handleSeek(e);
+      };
+      const handleGlobalPointerUp = () => {
+        handlePointerUp();
+      };
+
+      window.addEventListener('pointermove', handleGlobalPointerMove);
+      window.addEventListener('pointerup', handleGlobalPointerUp);
+
+      return () => {
+        window.removeEventListener('pointermove', handleGlobalPointerMove);
+        window.removeEventListener('pointerup', handleGlobalPointerUp);
+      };
+    }
+  }, [isSeeking]);
 
   const overlayVariants = {
     hidden: { 
@@ -268,13 +290,13 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
             playsInline
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
-            onEnded={() => pause()}
+            onEnded={() => { pause(); setShowControls(true); }}
             onError={handleVideoError}
           />
           {/* Gradient Overlay for Full Screen */}
           <motion.div 
             initial={{ opacity: 0 }}
-            animate={{ opacity: viewMode === 'full' ? 1 : 0 }}
+            animate={{ opacity: (viewMode === 'full' && showControls) ? 1 : 0 }}
             className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/60 pointer-events-none z-10"
           />
         </motion.div>
@@ -306,55 +328,43 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 handlePointerDown={handlePointerDown}
                 handlePointerMove={handlePointerMove}
                 handlePointerUp={handlePointerUp}
+                seekerRef={seekerRef}
+                showDrawer={showDrawer}
+                setShowDrawer={setShowDrawer}
               />
             </motion.div>
 
             {/* Layer 2: Drawer System (Swipe Zone & Drawer Sheet) */}
             <div className="absolute inset-0 w-full h-full z-40 pointer-events-none">
-              {/* Swipe Up Zone (Active for the bottom 1/3) */}
-              {!showDrawer && showControls && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute bottom-0 left-0 w-full h-1/3 pointer-events-auto flex flex-col items-center justify-end pb-12 cursor-pointer transition-opacity"
-                  drag="y"
-                  dragConstraints={{ top: -300, bottom: 0 }}
-                  dragElastic={0.1}
-                  dragPropagation={true}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.y < -50) {
-                      setShowDrawer(true);
-                    }
-                  }}
-                  onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}
-                >
-                  <div className="flex flex-col items-center gap-1 pointer-events-none">
-                    <span className="material-symbols-outlined text-white text-3xl drop-shadow-md">expand_less</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/90 drop-shadow-lg">Upcoming</span>
-                  </div>
-                </motion.div>
-              )}
-
               {/* Drawer Sheet */}
               <AnimatePresence>
                 {showDrawer && (
-                  <motion.div 
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    exit={{ y: '100%' }}
-                    drag="y"
-                    dragConstraints={{ top: 0, bottom: 800 }}
-                    dragElastic={0.1}
-                    dragPropagation={false}
-                    onDragEnd={(_, info) => {
-                      if (info.offset.y > 150) {
-                        setShowDrawer(false);
-                      }
-                    }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="absolute bottom-0 left-0 w-full h-[65%] bg-surface-dark/95 backdrop-blur-xl pointer-events-auto rounded-t-[32px] border-t border-white/10 flex flex-col touch-none"
-                  >
+                  <>
+                    {/* Backdrop for click outside to close */}
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setShowDrawer(false)}
+                      className="absolute inset-0 bg-black/40 backdrop-blur-md pointer-events-auto cursor-pointer"
+                    />
+
+                    <motion.div 
+                      initial={{ y: '100%' }}
+                      animate={{ y: 0 }}
+                      exit={{ y: '100%' }}
+                      drag="y"
+                      dragConstraints={{ top: 0, bottom: 800 }}
+                      dragElastic={0.1}
+                      dragPropagation={false}
+                      onDragEnd={(_, info) => {
+                        if (info.offset.y > 150) {
+                          setShowDrawer(false);
+                        }
+                      }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                      className="absolute bottom-0 left-0 w-full h-[65%] bg-surface-dark/95 backdrop-blur-xl pointer-events-auto rounded-t-[32px] border-t border-white/10 flex flex-col touch-none"
+                    >
                     <div 
                       className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-6 cursor-pointer"
                       onClick={() => setShowDrawer(false)}
@@ -411,6 +421,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                       ))}
                     </div>
                   </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>

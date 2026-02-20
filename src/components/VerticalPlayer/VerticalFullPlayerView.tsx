@@ -19,6 +19,9 @@ interface VerticalFullPlayerViewProps {
   handlePointerDown: (e: React.PointerEvent) => void;
   handlePointerMove: (e: React.PointerEvent) => void;
   handlePointerUp: () => void;
+  seekerRef: React.RefObject<HTMLDivElement | null>;
+  showDrawer: boolean;
+  setShowDrawer: (show: boolean) => void;
 }
 
 const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
@@ -34,7 +37,10 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   handleRetry,
   handlePointerDown,
   handlePointerMove,
-  handlePointerUp
+  handlePointerUp,
+  seekerRef,
+  showDrawer,
+  setShowDrawer
 }) => {
   const { currentVideo, minimize } = usePlayerStore();
 
@@ -75,7 +81,7 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-0 left-0 w-full z-30 pt-16 px-6"
+            className="absolute top-0 left-0 w-full z-30 pt-6 px-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
@@ -127,52 +133,82 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Bottom Section */}
+      {/* Bottom Interaction Layer (Unifies Seeker & Upcoming Swipe) */}
       <AnimatePresence mode="wait">
         {showControls && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-0 left-0 w-full z-20 pb-10"
+            className="absolute bottom-0 left-0 w-full z-20 pb-8 pt-4 flex flex-col items-center pointer-events-auto"
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.1}
+            onDragEnd={(_, info) => {
+              if (info.offset.y < -50) {
+                setShowDrawer(true);
+              }
+            }}
           >
-            {/* Progress Bar */}
-            <div className="px-6 mb-2">
+            {/* Progress Bar Container */}
+            <div className="w-full px-6 mb-4">
               <div 
-                className="relative w-full h-4 flex items-center cursor-pointer group"
+                ref={seekerRef}
+                className="relative w-full h-6 flex items-center cursor-pointer group"
                 onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
               >
-                <motion.div 
-                  className="w-full bg-white/10 rounded-full overflow-hidden"
-                  animate={{ height: isSeeking ? 6 : 4 }}
-                >
+                {/* Track */}
+                <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden">
                   <motion.div 
                     className="h-full bg-primary shadow-[0_0_12px_rgba(173,43,238,0.8)]"
                     style={{ width: `${(progress / (duration || 1)) * 100}%` }}
                   />
-                </motion.div>
+                </div>
+                
+                {/* Knob (Slider Behaviour) */}
                 <motion.div 
-                  className="absolute w-4 h-4 bg-white rounded-full shadow-2xl border-2 border-primary z-20"
-                  style={{ left: `${(progress / (duration || 1)) * 100}%`, transform: 'translateX(-50%)' }}
-                  animate={{ 
-                    scale: isSeeking ? 1.5 : 0,
-                    opacity: isSeeking ? 1 : 0
+                  className="absolute w-5 h-5 bg-white rounded-full shadow-2xl border-2 border-primary z-20 cursor-grab active:cursor-grabbing"
+                  style={{ 
+                    left: `${(progress / (duration || 1)) * 100}%`, 
+                    x: '-50%' 
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  drag="x"
+                  dragConstraints={seekerRef}
+                  dragElastic={0}
+                  dragMomentum={false}
+                  onDrag={(_, info) => {
+                    if (seekerRef.current) {
+                      // Perform live seeking during drag
+                      handlePointerMove({ clientX: info.point.x } as any);
+                    }
+                  }}
+                  onDragEnd={() => {
+                    handlePointerUp();
+                  }}
+                  // Using our existing handlePointerMove logic via handleSeek in parent
+                  onPointerMove={handlePointerMove}
+                  animate={{ 
+                    scale: isSeeking ? 1.2 : 1,
+                    opacity: 1
+                  }}
+                  whileHover={{ scale: 1.2 }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] font-black text-white/60 mt-2 uppercase tracking-widest">
+              <div className="flex justify-between text-[10px] font-black text-white/60 mt-1 uppercase tracking-widest">
                 <span className={isSeeking ? 'text-primary' : ''}>{formatTime(progress)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
             </div>
 
-            {/* Bottom Controls / Spacing */}
-            <div className="pt-6 pb-20 flex flex-col items-center">
-            </div>
+            {/* Upcoming Prompt */}
+            {!showDrawer && (
+              <div className="flex flex-col items-center gap-1 pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="material-symbols-outlined text-white text-2xl drop-shadow-md animate-bounce">expand_less</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/90 drop-shadow-lg">Upcoming</span>
+              </div>
+            )}
+            
+            <div className="pb-4" />
           </motion.div>
         )}
       </AnimatePresence>
