@@ -4,12 +4,14 @@ import { usePlayerStore } from '../../store/usePlayerStore';
 
 interface VerticalMiniPlayerViewProps {
   handlePlayPause: (e?: React.MouseEvent) => void;
+  handleClose: (e: React.MouseEvent) => void;
 }
 
 const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({ 
-  handlePlayPause 
+  handlePlayPause,
+  handleClose 
 }) => {
-  const { currentVideo, status, close } = usePlayerStore();
+  const { currentVideo, status } = usePlayerStore();
 
   if (!currentVideo) return null;
 
@@ -65,7 +67,7 @@ const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({
              </span>
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); close(); }} 
+            onClick={handleClose} 
             className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-white/40 active:scale-90 transition-transform"
           >
              <span className="material-symbols-outlined text-2xl">close</span>

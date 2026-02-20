@@ -12,9 +12,11 @@ interface VerticalFullPlayerViewProps {
   duration: number;
   error: string | null;
   isSeeking: boolean;
+  isPiPActive: boolean;
   handlePlayPause: (e?: React.MouseEvent) => void;
   handleSkipForward: (e: React.MouseEvent) => void;
   handleSkipBackward: (e: React.MouseEvent) => void;
+  handleTogglePiP: (e: React.MouseEvent) => void;
   handleRetry: (e: React.MouseEvent) => void;
   onSeek: (time: number) => void;
   onSeekStart: () => void;
@@ -30,9 +32,11 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   duration,
   error,
   isSeeking,
+  isPiPActive,
   handlePlayPause,
   handleSkipForward,
   handleSkipBackward,
+  handleTogglePiP,
   handleRetry,
   onSeek,
   onSeekStart,
@@ -91,12 +95,24 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
                   className="mt-2 bg-primary/30 backdrop-blur-sm border border-primary/20"
                 />
               </div>
-              <button 
-                onClick={(e) => { e.stopPropagation(); minimize(); }}
-                className="mt-1 text-white/80 active:scale-90 transition-transform"
-              >
-                <span className="material-symbols-outlined text-2xl">expand_more</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleTogglePiP}
+                  className={`mt-1 active:scale-90 transition-all ${
+                    isPiPActive ? 'text-primary' : 'text-white/80'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-2xl">
+                    {isPiPActive ? 'picture_in_picture_alt' : 'picture_in_picture'}
+                  </span>
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); minimize(); }}
+                  className="mt-1 text-white/80 active:scale-90 transition-transform"
+                >
+                  <span className="material-symbols-outlined text-2xl">expand_more</span>
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

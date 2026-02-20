@@ -4,6 +4,9 @@ import { usePlayerStore } from '../../store/usePlayerStore';
 import VerticalFullPlayerView from './VerticalFullPlayerView';
 import VerticalMiniPlayerView from './VerticalMiniPlayerView';
 import VerticalVideoDrawer from './VerticalVideoDrawer';
+import AutoPlayOverlay from './AutoPlayOverlay';
+import { useVideoFeed } from '../../hooks/useVideoFeed';
+import type { Video } from '../../store/usePlayerStore';
 
 const VerticalVideoPlayerOverlay: React.FC = () => {
   const { 
@@ -20,18 +23,21 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     maximize,
     originRect,
     error,
-    setError
+    setError,
+    close
   } = usePlayerStore();
   
   const [showControls, setShowControls] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [isPiPActive, setIsPiPActive] = useState(false);
+  const [nextVideoToAutoPlay, setNextVideoToAutoPlay] = useState<Video | null>(null);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  
+  const { filteredVideos } = useVideoFeed(true);
   
   // Drag and animation values
   const y = useMotionValue(0);
@@ -97,6 +103,28 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
       }
     }
   }, [status, currentVideo, pause]);
+
+  // Picture-in-Picture event listeners
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnterPiP = () => setIsPiPActive(true);
+    const handleLeavePiP = () => setIsPiPActive(false);
+
+    video.addEventListener('enterpictureinpicture', handleEnterPiP);
+    video.addEventListener('leavepictureinpicture', handleLeavePiP);
+
+    // Set autoPiP manually as it might not be in the type definitions
+    if ('autoPictureInPicture' in video) {
+      (video as any).autoPictureInPicture = true;
+    }
+
+    return () => {
+      video.removeEventListener('enterpictureinpicture', handleEnterPiP);
+      video.removeEventListener('leavepictureinpicture', handleLeavePiP);
+    };
+  }, []);
 
   const handleTimeUpdate = () => {
     if (videoRef.current && !isSeeking) {
@@ -175,6 +203,66 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const handleSeekEnd = () => {
     setIsSeeking(false);
+  };
+
+  const handleTogglePiP = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+      } else if (document.pictureInPictureEnabled) {
+        await videoRef.current.requestPictureInPicture();
+      }
+    } catch (error) {
+      console.error('PiP failed:', error);
+    }
+  };
+
+  const handleClose = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (document.pictureInPictureElement && document.pictureInPictureElement === videoRef.current) {
+      try {
+        await document.exitPictureInPicture();
+      } catch (error) {
+        console.error('Failed to exit PiP on close:', error);
+      }
+    }
+    close();
+  };
+
+  const handleVideoEnded = () => {
+    pause(); 
+    setShowControls(true);
+    
+    if (filteredVideos.length > 1 && currentVideo) {
+      const currentIndex = filteredVideos.findIndex(v => v.slug === currentVideo.slug);
+      const nextIndex = (currentIndex + 1) % filteredVideos.length;
+      const nextVid = filteredVideos[nextIndex];
+      
+      setNextVideoToAutoPlay({
+        slug: nextVid.slug,
+        title: nextVid.title,
+        thumbnailUrl: nextVid.thumbnailUrl,
+        mediaUrl: nextVid.mediaUrl,
+        channelName: nextVid.channelName,
+        channelAvatarUrl: nextVid.channelAvatarUrl,
+        categorySlug: nextVid.categorySlug,
+        categoryName: nextVid.categoryName
+      });
+    }
+  };
+
+  const handleAutoPlayCancel = () => {
+    setNextVideoToAutoPlay(null);
+  };
+
+  const handleAutoPlayComplete = () => {
+    if (nextVideoToAutoPlay) {
+      play(nextVideoToAutoPlay);
+      setNextVideoToAutoPlay(null);
+    }
   };
 
   const overlayVariants = {
@@ -262,7 +350,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
             playsInline
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
-            onEnded={() => { pause(); setShowControls(true); }}
+            onEnded={handleVideoEnded}
             onError={handleVideoError}
           />
           {/* Gradient Overlay for Full Screen */}
@@ -300,9 +388,11 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 duration={duration}
                 error={error}
                 isSeeking={isSeeking}
+                isPiPActive={isPiPActive}
                 handlePlayPause={handlePlayPause}
                 handleSkipForward={handleSkipForward}
                 handleSkipBackward={handleSkipBackward}
+                handleTogglePiP={handleTogglePiP}
                 handleRetry={handleRetry}
                 onSeek={handleSeekChange}
                 onSeekStart={handleSeekStart}
@@ -326,8 +416,21 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
         {viewMode === 'mini' && (
           <VerticalMiniPlayerView 
             handlePlayPause={handlePlayPause}
+            handleClose={handleClose}
           />
         )}
+
+        <AnimatePresence>
+          {nextVideoToAutoPlay && (
+            <AutoPlayOverlay
+              key={nextVideoToAutoPlay.slug}
+              nextVideo={nextVideoToAutoPlay}
+              onCancel={handleAutoPlayCancel}
+              onPlayNow={handleAutoPlayComplete}
+              onComplete={handleAutoPlayComplete}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );
