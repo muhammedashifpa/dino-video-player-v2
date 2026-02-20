@@ -17,7 +17,7 @@ html, body {
 }
 
 @theme {
-  --font-display: "Space Grotesk", sans-serif;
+  /* --font-display: "Space Grotesk", sans-serif; */
 
   --color-primary: #ad2bee;
   --color-background-light: #f7f6f8;

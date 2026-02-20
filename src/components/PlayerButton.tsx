@@ -25,11 +25,21 @@ const PlayerButton: React.FC<PlayerButtonProps> = ({
   return (
     <motion.button
       layout
-      whileTap={{ scale: isLarge ? 0.95 : 0.9 }}
-      className={`rounded-full flex items-center justify-center border text-white transition-all pointer-events-auto ${baseClasses} ${className}`}
+      whileHover={{ 
+        scale: 1.05, 
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ 
+        scale: 0.88, 
+        backgroundColor: '#ad2bee',
+        borderColor: '#ad2bee',
+        transition: { type: "spring", stiffness: 400, damping: 20 } 
+      }}
+      className={`relative rounded-full flex items-center justify-center border text-white transition-colors pointer-events-auto ${baseClasses} ${className}`}
       {...props}
     >
-      <span className={`material-symbols-outlined ${isLarge ? 'text-4xl' : 'text-2xl'} ${isActive ? 'filled-icon' : ''} ${iconClassName}`}>
+      <span className={`material-symbols-outlined ${isLarge ? 'text-4xl' : 'text-2xl'} ${isActive ? 'filled-icon' : ''} ${iconClassName} relative z-10`}>
         {icon}
       </span>
     </motion.button>

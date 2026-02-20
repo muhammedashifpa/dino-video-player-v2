@@ -27,6 +27,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const [showControls, setShowControls] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -39,6 +40,13 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   // Transform values for mini-player transition
   const opacity = useTransform(y, [0, screenHeight * 0.4], [1, 0.5]);
   const scale = useTransform(y, [0, screenHeight * 0.4], [1, 0.9]);
+  const dragY = useTransform(y, [0, 800], [0, 800]);
+
+  // Helper to reset auto-hide timer
+  const resetAutoHideTimer = () => {
+    setShowControls(true);
+    setLastInteractionTime(Date.now());
+  };
 
   // Auto-hide controls
   useEffect(() => {
@@ -51,12 +59,12 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     return () => {
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     };
-  }, [showControls, viewMode, status, error]);
+  }, [showControls, viewMode, status, error, lastInteractionTime]);
 
   // Show controls on video change or expansion
   useEffect(() => {
     if (currentVideo?.slug || viewMode === 'full') {
-      setShowControls(true);
+      resetAutoHideTimer();
     }
   }, [currentVideo?.slug, viewMode]);
 
@@ -97,7 +105,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const handlePlayPause = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setShowControls(true);
+    resetAutoHideTimer();
     if (status === 'playing') {
       pause();
     } else if (currentVideo) {
@@ -107,7 +115,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const handleSkipForward = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowControls(true);
+    resetAutoHideTimer();
     if (videoRef.current) {
       videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, duration);
     }
@@ -115,7 +123,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const handleSkipBackward = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowControls(true);
+    resetAutoHideTimer();
     if (videoRef.current) {
       videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
     }
@@ -123,14 +131,16 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const toggleControls = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowControls(prev => !prev);
+    if (!showControls) {
+      resetAutoHideTimer();
+    } else {
+      setShowControls(false);
+    }
   };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (viewMode === 'full' && info.offset.y > 150) {
       minimize();
-    } else if (viewMode === 'full' && info.offset.y < -150) {
-      setShowDrawer(true);
     }
     y.set(0);
   };
@@ -205,7 +215,31 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
       width: 'calc(100% - 16px)',
       height: 92,
       opacity: 1,
-      borderRadius: 16,
+      borderRadius: 8,
+    }
+  };
+
+  const videoContainerVariants = {
+    hidden: {
+      width: originRect?.width ?? '100%',
+      height: originRect?.height ?? '100%',
+      x: 0,
+      y: 0,
+      borderRadius: 12,
+    },
+    full: {
+      width: '100%',
+      height: '100%',
+      x: 0,
+      y: 0,
+      borderRadius: 0,
+    },
+    mini: {
+      width: 112, // w-28
+      height: 92,
+      x: 0,
+      y: 0,
+      borderRadius: 0,
     }
   };
 
@@ -222,58 +256,74 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
         exit="hidden"
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onClick={() => viewMode === 'mini' && maximize()}
-        className="fixed z-50 overflow-hidden bg-black shadow-2xl flex flex-col items-center"
+        className={`fixed z-50 overflow-hidden shadow-2xl flex flex-col items-center ${
+          viewMode === 'mini' ? 'bg-transparent' : 'bg-black'
+        }`}
       >
+        {/* Shared Video Container */}
+        <motion.div
+          variants={videoContainerVariants}
+          initial="hidden"
+          animate={viewMode}
+          className={`absolute left-0 top-0 overflow-hidden bg-black transition-all ${
+            viewMode === 'mini' ? 'z-30 pointer-events-none' : 'z-0'
+          }`}
+        >
+          <video
+            ref={videoRef}
+            src={currentVideo.mediaUrl}
+            poster={currentVideo.thumbnailUrl}
+            className="w-full h-full object-cover"
+            playsInline
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onEnded={() => pause()}
+            onError={handleVideoError}
+          />
+          {/* Gradient Overlay for Full Screen */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: viewMode === 'full' ? 1 : 0 }}
+            className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/60 pointer-events-none z-10"
+          />
+        </motion.div>
+
         {/* Full Screen View */}
         {viewMode === 'full' && (
           <motion.div 
-            className="relative w-full h-full flex flex-col max-w-[430px] mx-auto overflow-hidden"
-            style={{ y, opacity, scale }}
+            className="relative w-full h-full flex flex-col max-w-[430px] mx-auto overflow-hidden z-20"
+            style={{ y: dragY, opacity, scale }}
             drag="y"
-            dragConstraints={{ top: -100, bottom: 0 }}
-            dragElastic={0.2}
+            dragConstraints={{ top: 0, bottom: 800 }}
+            dragElastic={0.1}
             onDragEnd={handleDragEnd}
+            onClick={toggleControls}
           >
-            {/* Background Video */}
-            <div className="absolute inset-0 z-0">
-              <video
-                ref={videoRef}
-                src={currentVideo.mediaUrl}
-                poster={currentVideo.thumbnailUrl}
-                className="w-full h-full object-cover"
-                playsInline
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={() => pause()}
-                onError={handleVideoError}
-                onClick={toggleControls}
-              />
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/60 z-10 pointer-events-none" />
-              
-              {/* Error Overlay */}
-              <AnimatePresence>
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-40 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center"
+            {/* Background Layer (Visuals only) */}
+            <div className="absolute inset-0 z-0 pointer-events-none" />
+
+            {/* Error Overlay */}
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-40 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center"
+                >
+                  <span className="material-symbols-outlined text-white/40 text-6xl mb-6">error</span>
+                  <h3 className="text-white text-lg font-bold mb-2">Playback Error</h3>
+                  <p className="text-white/60 text-sm mb-8 max-w-xs">{error}</p>
+                  <button 
+                    onClick={handleRetry}
+                    className="px-8 py-3 rounded-full bg-white text-black font-bold text-sm active:scale-95 transition-transform flex items-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-white/40 text-6xl mb-6">error</span>
-                    <h3 className="text-white text-lg font-bold mb-2">Playback Error</h3>
-                    <p className="text-white/60 text-sm mb-8 max-w-xs">{error}</p>
-                    <button 
-                      onClick={handleRetry}
-                      className="px-8 py-3 rounded-full bg-white text-black font-bold text-sm active:scale-95 transition-transform flex items-center gap-2"
-                    >
-                      <span className="material-symbols-outlined text-sm">replay</span>
-                      Try Again
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <span className="material-symbols-outlined text-sm">replay</span>
+                    Try Again
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Header */}
             <AnimatePresence>
@@ -346,44 +396,69 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                   {/* Progress Bar */}
                   <div className="px-6 mb-2">
                     <div 
-                      className="relative w-full h-3 flex items-center cursor-pointer group"
+                      className="relative w-full h-4 flex items-center cursor-pointer group"
                       onPointerDown={handlePointerDown}
                       onPointerMove={handlePointerMove}
                       onPointerUp={handlePointerUp}
                       onPointerLeave={handlePointerUp}
                     >
-                      <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div 
+                        className="w-full bg-white/10 rounded-full overflow-hidden"
+                        animate={{ height: isSeeking ? 6 : 4 }}
+                      >
                         <motion.div 
-                          className="h-full bg-primary shadow-[0_0_8px_rgba(173,43,238,0.5)]"
+                          className="h-full bg-primary shadow-[0_0_12px_rgba(173,43,238,0.8)]"
                           style={{ width: `${(progress / duration) * 100}%` }}
                         />
-                      </div>
+                      </motion.div>
                       <motion.div 
-                        className="absolute w-3 h-3 bg-white rounded-full shadow-lg border border-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute w-4 h-4 bg-white rounded-full shadow-2xl border-2 border-primary z-20"
                         style={{ left: `${(progress / duration) * 100}%`, transform: 'translateX(-50%)' }}
-                        animate={{ scale: isSeeking ? 1.5 : 1 }}
+                        animate={{ 
+                          scale: isSeeking ? 1.5 : 0,
+                          opacity: isSeeking ? 1 : 0
+                        }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       />
                     </div>
-                    <div className="flex justify-between text-[9px] font-bold text-white/40 mt-1.5 uppercase tracking-tighter">
-                      <span>{formatTime(progress)}</span>
+                    <div className="flex justify-between text-[10px] font-black text-white/60 mt-2 uppercase tracking-widest">
+                      <span className={isSeeking ? 'text-primary' : ''}>{formatTime(progress)}</span>
                       <span>{formatTime(duration)}</span>
                     </div>
                   </div>
 
-                  {/* Drawer Handle */}
-                  <div className="pt-6 pb-4 flex flex-col items-center">
-                    <div 
-                      className="flex flex-col items-center animate-pulse cursor-pointer"
-                      onClick={() => setShowDrawer(true)}
-                    >
-                      <span className="material-symbols-outlined text-white text-2xl">expand_less</span>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/90">Upcoming Videos</span>
-                    </div>
-                    <div className="w-32 h-1 bg-white/20 rounded-full mt-4"></div>
+                  {/* Bottom Controls / Spacing */}
+                  <div className="pt-6 pb-20 flex flex-col items-center">
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Swipe Up Box for Drawer */}
+            {!showDrawer && showControls && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40"
+              >
+                <motion.div
+                  drag="y"
+                  dragConstraints={{ top: -200, bottom: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.y < -50) {
+                      setShowDrawer(true);
+                    }
+                  }}
+                  onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}
+                  className="px-8 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing shadow-2xl group active:scale-95 transition-all"
+                >
+                  <span className="material-symbols-outlined text-white text-2xl group-hover:-translate-y-1 transition-transform">expand_less</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">Upcoming</span>
+                </motion.div>
+              </motion.div>
+            )}
 
             {/* Upcoming Videos Drawer (Bottom Sheet) */}
             <AnimatePresence>
@@ -458,25 +533,59 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
         {/* Mini Player View */}
         {viewMode === 'mini' && (
-          <div className="w-full h-full flex items-center pr-4 gap-3 bg-surface-dark/95 backdrop-blur-xl border border-white/5">
-             <div className="w-28 h-full shrink-0 bg-black/40 overflow-hidden">
-                <img src={currentVideo.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+          <div className="relative w-full h-full flex items-center pr-4 gap-3 bg-white dark:bg-background-dark/80 backdrop-blur-none dark:backdrop-blur-md border-none box-content z-20">
+             {/* Dynamic Spacer for the shared video element */}
+             <div className="w-28 h-full shrink-0">
+                {/* 
+                   The video container will animate here based on videoContainerVariants.mini.
+                   We leave this space empty but with specific dimensions.
+                */}
              </div>
-             <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white truncate">{currentVideo.title}</p>
+             <div className="flex-1 min-w-0 flex flex-col justify-center overflow-hidden">
+                <div className="relative overflow-hidden">
+                  <motion.div
+                    key={`marquee-title-${currentVideo.slug}`}
+                    initial={{ x: 0 }}
+                    animate={{ 
+                      x: status === 'playing' ? [0, -400] : 0 
+                    }}
+                    transition={{ 
+                      duration: 15, 
+                      repeat: Infinity, 
+                      ease: "linear",
+                      repeatDelay: 1
+                    }}
+                    className="whitespace-nowrap inline-block"
+                  >
+                    <span className="text-sm font-bold text-slate-900 dark:text-white pr-10">
+                      {currentVideo.title}
+                    </span>
+                    {status === 'playing' && (
+                      <span className="text-sm font-bold text-slate-900 dark:text-white pr-10">
+                        {currentVideo.title}
+                      </span>
+                    )}
+                  </motion.div>
+                  {/* Fade edges */}
+                  <div className="absolute inset-y-0 left-0 w-4 bg-linear-to-r from-white dark:from-background-dark to-transparent z-10" />
+                  <div className="absolute inset-y-0 right-0 w-4 bg-linear-to-l from-white dark:from-background-dark to-transparent z-10" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/80 mt-0.5 ml-1 truncate">
+                  {currentVideo.categoryName || 'Tech'}
+                </span>
              </div>
              <div className="flex items-center gap-1">
                 <button 
                   onClick={handlePlayPause} 
-                  className="w-12 h-12 flex items-center justify-center text-white active:scale-90 transition-transform"
+                  className="w-12 h-12 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-all"
                 >
-                   <span className="material-symbols-outlined text-4xl filled-icon">
+                   <span className="material-symbols-outlined text-3xl filled-icon">
                       {status === 'playing' ? 'pause' : 'play_arrow'}
                    </span>
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); close(); }} 
-                  className="w-10 h-10 flex items-center justify-center text-white/40 active:scale-90 transition-transform"
+                  className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-white/40 active:scale-90 transition-transform"
                 >
                    <span className="material-symbols-outlined text-2xl">close</span>
                 </button>
