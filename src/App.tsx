@@ -34,14 +34,14 @@ function App() {
     };
 
     play({
-      slug: video.slug || video.title,
+      slug: video.slug,
       title: video.title,
       thumbnailUrl: video.thumbnailUrl,
-      mediaUrl: video.mediaUrl || '',
+      mediaUrl: video.mediaUrl,
       channelName: video.channelName,
       channelAvatarUrl: video.channelAvatarUrl,
-      categorySlug: video.categorySlug || 'all',
-      categoryName: video.categoryName || 'Artificial Intelligence'
+      categorySlug: video.categorySlug,
+      categoryName: video.categoryName
     }, originRect);
   };
 

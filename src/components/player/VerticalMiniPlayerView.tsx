@@ -52,7 +52,7 @@ const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({
             <div className="absolute inset-y-0 right-0 w-4 bg-linear-to-l from-white dark:from-background-dark to-transparent z-10" />
           </div>
           <span className="text-[10px] font-black uppercase tracking-widest text-primary/80 mt-0.5 ml-1 truncate">
-            {currentVideo.categoryName || 'Tech'}
+            {currentVideo.categoryName}
           </span>
        </div>
        <div className="flex items-center gap-1">

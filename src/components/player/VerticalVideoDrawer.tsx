@@ -71,14 +71,14 @@ const VerticalVideoDrawer: React.FC<VerticalVideoDrawerProps> = ({
                     onClick={() => {
                       if (isActive) return;
                       play({
-                        slug: video.slug || video.title,
+                        slug: video.slug,
                         title: video.title,
                         thumbnailUrl: video.thumbnailUrl,
-                        mediaUrl: video.mediaUrl || '',
+                        mediaUrl: video.mediaUrl,
                         channelName: video.channelName,
                         channelAvatarUrl: video.channelAvatarUrl,
-                        categorySlug: video.categorySlug || 'all',
-                        categoryName: video.categoryName || 'Tech'
+                        categorySlug: video.categorySlug,
+                        categoryName: video.categoryName
                       });
                       setShowDrawer(false);
                     }}

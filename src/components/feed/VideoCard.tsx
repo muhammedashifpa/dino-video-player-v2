@@ -10,11 +10,11 @@ export interface VideoCardProps {
   channelName: string;
   views: string;
   uploadedAt: string;
+  slug: string;
+  mediaUrl: string;
+  categorySlug: string;
+  categoryName: string;
   onClick?: (e: React.MouseEvent) => void;
-  categorySlug?: string;
-  categoryName?: string;
-  slug?: string;
-  mediaUrl?: string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({

@@ -87,7 +87,7 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
                   {currentVideo.title}
                 </h2>
                 <CategoryTag 
-                  label={currentVideo.categoryName || 'Artificial Intelligence'} 
+                  label={currentVideo.categoryName} 
                   className="mt-2 bg-primary/30 backdrop-blur-sm border border-primary/20"
                 />
               </div>
