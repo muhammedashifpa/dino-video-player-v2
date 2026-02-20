@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePlayerStore } from '../../store/usePlayerStore';
-import { useVideoFeed } from '../../hooks/useVideoFeed';
 import CategoryTag from '../CategoryTag';
 import PlayerButton from '../ui/PlayerButton';
 import { formatTime } from '../../utils/timeUtils';
@@ -12,8 +11,6 @@ interface VerticalFullPlayerViewProps {
   progress: number;
   duration: number;
   error: string | null;
-  showDrawer: boolean;
-  setShowDrawer: (show: boolean) => void;
   isSeeking: boolean;
   handlePlayPause: (e?: React.MouseEvent) => void;
   handleSkipForward: (e: React.MouseEvent) => void;
@@ -30,8 +27,6 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   progress,
   duration,
   error,
-  showDrawer,
-  setShowDrawer,
   isSeeking,
   handlePlayPause,
   handleSkipForward,
@@ -41,8 +36,7 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   handlePointerMove,
   handlePointerUp
 }) => {
-  const { currentVideo, minimize, play } = usePlayerStore();
-  const { filteredVideos } = useVideoFeed(true);
+  const { currentVideo, minimize } = usePlayerStore();
 
   if (!currentVideo) return null;
 
@@ -183,100 +177,6 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Swipe Up Box for Drawer */}
-      {!showDrawer && showControls && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40"
-        >
-          <motion.div
-            drag="y"
-            dragConstraints={{ top: -200, bottom: 0 }}
-            dragElastic={0.2}
-            onDragEnd={(_, info) => {
-              if (info.offset.y < -50) {
-                setShowDrawer(true);
-              }
-            }}
-            onClick={(e) => { e.stopPropagation(); setShowDrawer(true); }}
-            className="px-8 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing shadow-2xl group active:scale-95 transition-all"
-          >
-            <span className="material-symbols-outlined text-white text-2xl group-hover:-translate-y-1 transition-transform">expand_less</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">Upcoming</span>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Upcoming Videos Drawer (Bottom Sheet) */}
-      <AnimatePresence>
-        {showDrawer && (
-          <motion.div 
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="absolute bottom-0 left-0 w-full h-[65%] bg-surface-dark/95 backdrop-blur-xl z-50 rounded-t-[32px] border-t border-white/10 flex flex-col"
-          >
-            <div 
-              className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-6 cursor-pointer"
-              onClick={() => setShowDrawer(false)}
-            />
-            
-            {/* Category Filter */}
-            <div className="px-6 mb-6 overflow-x-auto scrollbar-none">
-              <div className="flex gap-2 whitespace-nowrap">
-                {['All', 'Tech', 'AI', 'Design'].map((cat) => (
-                  <button 
-                    key={cat}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors ${
-                      cat === 'All' 
-                        ? 'bg-primary text-white border-primary' 
-                        : 'bg-white/5 text-white/60 border-white/10'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* List */}
-            <div className="flex-1 overflow-y-auto px-6 space-y-4 pb-20 scrollbar-none">
-              {filteredVideos.map((video, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => {
-                    play({
-                      slug: video.slug || video.title,
-                      title: video.title,
-                      thumbnailUrl: video.thumbnailUrl,
-                      mediaUrl: video.mediaUrl || '',
-                      channelName: video.channelName,
-                      channelAvatarUrl: video.channelAvatarUrl,
-                      categorySlug: video.categorySlug || 'all',
-                      categoryName: video.categoryName || 'Tech'
-                    });
-                    setShowDrawer(false);
-                  }}
-                  className="flex gap-4 items-center p-2 rounded-2xl hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  <div className="w-24 h-16 rounded-xl overflow-hidden bg-black/40 border border-white/5 shrink-0">
-                    <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-white truncate">{video.title}</h4>
-                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest mt-1">
-                      {video.categorySlug || 'Tech'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };
