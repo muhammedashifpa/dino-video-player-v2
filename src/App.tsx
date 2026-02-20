@@ -8,7 +8,7 @@ import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
 import { usePlayerStore } from './store/usePlayerStore';
-import VerticalVideoPlayerOverlay from './components/VerticalVideoPlayerOverlay';
+import VerticalVideoPlayerOverlay from './components/VerticalPlayer/VerticalVideoPlayerOverlay';
 
 function App() {
   const scrollRef = useRef<HTMLElement>(null);

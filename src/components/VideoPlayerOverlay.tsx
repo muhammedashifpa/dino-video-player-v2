@@ -160,7 +160,8 @@ const VideoPlayerOverlay: React.FC = () => {
         mediaUrl: video.mediaUrl || '',
         channelName: video.channelName,
         channelAvatarUrl: video.channelAvatarUrl,
-        categorySlug: video.categorySlug || 'all'
+        categorySlug: video.categorySlug || 'all',
+        categoryName: video.categoryName || 'Tech'
     });
   };
 
