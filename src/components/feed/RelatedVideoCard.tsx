@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { type Video } from '../store/usePlayerStore';
+import { type Video } from '../../store/usePlayerStore';
 
 interface RelatedVideoCardProps {
   video: Video;

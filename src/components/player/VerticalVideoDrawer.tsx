@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePlayerStore } from '../../store/usePlayerStore';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
-import CategoryPills from '../CategoryPills';
+import CategoryPills from '../feed/CategoryPills';
 
 interface VerticalVideoDrawerProps {
   showDrawer: boolean;

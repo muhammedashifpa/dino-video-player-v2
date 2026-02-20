@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { VideoCardProps } from '../components/VideoCard';
+import type { VideoCardProps } from '../components/feed/VideoCard';
 import { MOCK_DATA } from '../data/mockData';
 import { DEFAULT_CATEGORY, LOAD_DELAY } from '../utils/constants';
 

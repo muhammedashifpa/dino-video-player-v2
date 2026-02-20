@@ -1,14 +1,14 @@
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import Layout from './components/Layout';
-import Header from './components/Header';
-import CategoryPills from './components/CategoryPills';
-import VideoCard, { type VideoCardProps } from './components/VideoCard';
+import Layout from './components/layout/Layout';
+import Header from './components/layout/Header';
+import CategoryPills from './components/feed/CategoryPills';
+import VideoCard, { type VideoCardProps } from './components/feed/VideoCard';
 import SkeletonVideoCard from './components/skeletons/SkeletonVideoCard';
 import { useVideoFeed } from './hooks/useVideoFeed';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
 import { usePlayerStore } from './store/usePlayerStore';
-import VerticalVideoPlayerOverlay from './components/VerticalPlayer/VerticalVideoPlayerOverlay';
+import VerticalVideoPlayerOverlay from './components/player/VerticalVideoPlayerOverlay';
 
 function App() {
   const scrollRef = useRef<HTMLElement>(null);

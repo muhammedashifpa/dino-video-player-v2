@@ -28,8 +28,8 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const [isSeeking, setIsSeeking] = useState(false);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seekTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const seekerRef = useRef<HTMLDivElement>(null);
   
   
   
@@ -99,7 +99,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   }, [status, currentVideo, pause]);
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isSeeking) {
       setProgress(videoRef.current.currentTime);
     }
   };
@@ -156,53 +156,26 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     }
   };
 
-  const handleSeek = (e: React.PointerEvent | React.MouseEvent | PointerEvent) => {
-    const rect = seekerRef.current?.getBoundingClientRect();
-    if (rect && videoRef.current) {
-      const x = e.clientX - rect.left;
-      const pct = Math.max(0, Math.min(1, x / rect.width));
-      const newTime = pct * duration;
-      videoRef.current.currentTime = newTime;
-      setProgress(newTime);
-    }
+  const handleSeekChange = (time: number) => {
+    setProgress(time);
+    
+    if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current);
+    
+    seekTimeoutRef.current = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = time;
+      }
+    }, 100);
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    e.stopPropagation();
+  const handleSeekStart = () => {
     setIsSeeking(true);
-    handleSeek(e);
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (isSeeking) {
-      handleSeek(e);
-    }
-  };
-
-  const handlePointerUp = () => {
+  const handleSeekEnd = () => {
     setIsSeeking(false);
   };
-
-  // Global pointer tracking for smoother seeking
-  useEffect(() => {
-    if (isSeeking) {
-      const handleGlobalPointerMove = (e: PointerEvent) => {
-        handleSeek(e);
-      };
-      const handleGlobalPointerUp = () => {
-        handlePointerUp();
-      };
-
-      window.addEventListener('pointermove', handleGlobalPointerMove);
-      window.addEventListener('pointerup', handleGlobalPointerUp);
-
-      return () => {
-        window.removeEventListener('pointermove', handleGlobalPointerMove);
-        window.removeEventListener('pointerup', handleGlobalPointerUp);
-      };
-    }
-  }, [isSeeking]);
 
   const overlayVariants = {
     hidden: { 
@@ -311,7 +284,14 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
               dragConstraints={{ top: 0, bottom: 800 }}
               dragElastic={0.1}
               onDragEnd={handleDragEnd}
-              onClick={() => !showControls && resetAutoHideTimer()}
+              onClick={() => {
+                if (!showControls) {
+                  resetAutoHideTimer();
+                } else if (status === 'playing') {
+                  setShowControls(false);
+                  if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                }
+              }}
             >
               <VerticalFullPlayerView 
                 showControls={showControls}
@@ -324,10 +304,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 handleSkipForward={handleSkipForward}
                 handleSkipBackward={handleSkipBackward}
                 handleRetry={handleRetry}
-                handlePointerDown={handlePointerDown}
-                handlePointerMove={handlePointerMove}
-                handlePointerUp={handlePointerUp}
-                seekerRef={seekerRef}
+                onSeek={handleSeekChange}
+                onSeekStart={handleSeekStart}
+                onSeekEnd={handleSeekEnd}
                 showDrawer={showDrawer}
                 setShowDrawer={setShowDrawer}
               />

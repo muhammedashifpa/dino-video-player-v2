@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePlayerStore } from '../../store/usePlayerStore';
-import CategoryTag from '../CategoryTag';
+import CategoryTag from '../feed/CategoryTag';
 import PlayerButton from '../ui/PlayerButton';
 import { formatTime } from '../../utils/timeUtils';
 
@@ -16,10 +16,9 @@ interface VerticalFullPlayerViewProps {
   handleSkipForward: (e: React.MouseEvent) => void;
   handleSkipBackward: (e: React.MouseEvent) => void;
   handleRetry: (e: React.MouseEvent) => void;
-  handlePointerDown: (e: React.PointerEvent) => void;
-  handlePointerMove: (e: React.PointerEvent) => void;
-  handlePointerUp: () => void;
-  seekerRef: React.RefObject<HTMLDivElement | null>;
+  onSeek: (time: number) => void;
+  onSeekStart: () => void;
+  onSeekEnd: () => void;
   showDrawer: boolean;
   setShowDrawer: (show: boolean) => void;
 }
@@ -35,10 +34,9 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   handleSkipForward,
   handleSkipBackward,
   handleRetry,
-  handlePointerDown,
-  handlePointerMove,
-  handlePointerUp,
-  seekerRef,
+  onSeek,
+  onSeekStart,
+  onSeekEnd,
   showDrawer,
   setShowDrawer
 }) => {
@@ -152,12 +150,8 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
           >
             {/* Progress Bar Container */}
             <div className="w-full px-6 mb-4">
-              <div 
-                ref={seekerRef}
-                className="relative w-full h-6 flex items-center cursor-pointer group"
-                onPointerDown={handlePointerDown}
-              >
-                {/* Track */}
+              <div className="relative w-full h-6 flex items-center group">
+                {/* Track Background */}
                 <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden">
                   <motion.div 
                     className="h-full bg-primary shadow-[0_0_12px_rgba(173,43,238,0.8)]"
@@ -165,28 +159,27 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
                   />
                 </div>
                 
-                {/* Knob (Slider Behaviour) */}
+                {/* Native Range Input (Transparent) */}
+                <input
+                  type="range"
+                  min={0}
+                  max={duration || 1}
+                  step="any"
+                  value={progress}
+                  onChange={(e) => onSeek(Number(e.target.value))}
+                  onPointerDown={onSeekStart}
+                  onPointerUp={onSeekEnd}
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
+                />
+
+                {/* Visual Thumb (Matches previous design) */}
                 <motion.div 
-                  className="absolute w-5 h-5 bg-white rounded-full shadow-2xl border-2 border-primary z-20 cursor-grab active:cursor-grabbing"
+                  className="absolute w-5 h-5 bg-white rounded-full shadow-2xl border-2 border-primary z-20 pointer-events-none"
                   style={{ 
                     left: `${(progress / (duration || 1)) * 100}%`, 
                     x: '-50%' 
                   }}
-                  drag="x"
-                  dragConstraints={seekerRef}
-                  dragElastic={0}
-                  dragMomentum={false}
-                  onDrag={(_, info) => {
-                    if (seekerRef.current) {
-                      // Perform live seeking during drag
-                      handlePointerMove({ clientX: info.point.x } as any);
-                    }
-                  }}
-                  onDragEnd={() => {
-                    handlePointerUp();
-                  }}
-                  // Using our existing handlePointerMove logic via handleSeek in parent
-                  onPointerMove={handlePointerMove}
                   animate={{ 
                     scale: isSeeking ? 1.2 : 1,
                     opacity: 1

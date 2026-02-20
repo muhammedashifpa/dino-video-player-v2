@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import SkeletonCategoryPills from './skeletons/SkeletonCategoryPills';
+import SkeletonCategoryPills from '../skeletons/SkeletonCategoryPills';
 
 interface CategoryPillsProps {
   categories?: string[];
