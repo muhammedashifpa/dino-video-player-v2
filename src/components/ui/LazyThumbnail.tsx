@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { optimizeThumbnail } from '../utils/imageUtils';
+import { optimizeThumbnail } from '../../utils/imageUtils';
 
 /**
  * LazyThumbnail
