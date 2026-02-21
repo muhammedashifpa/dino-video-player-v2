@@ -4,7 +4,7 @@ import { usePlayerStore } from '../../store/usePlayerStore';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
 import CategoryPills from '../feed/CategoryPills';
 import CloseButton from '../ui/CloseButton';
-import LazyThumbnail from '../LazyThumbnail';
+import LazyThumbnail from '../ui/LazyThumbnail';
 
 interface VerticalVideoDrawerProps {
   showDrawer: boolean;

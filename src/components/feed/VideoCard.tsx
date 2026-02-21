@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import CategoryTag from './CategoryTag';
-import LazyThumbnail from '../LazyThumbnail';
+import LazyThumbnail from '../ui/LazyThumbnail';
 
 
 export interface VideoCardProps {

@@ -14,7 +14,15 @@ import { optimizeThumbnail } from '../utils/imageUtils';
  *   width        {number} - Target display width used for Cloudinary optimization (default: 400)
  *   imgClassName {string} - Extra classes applied to the full <img> (e.g. hover effects)
  */
-const LazyThumbnail = ({ src, alt, width = 400, imgClassName = '' }) => {
+
+interface LazyThumbnailProps {
+  src: string;
+  alt: string;
+  width?: number;
+  imgClassName?: string;
+}
+
+const LazyThumbnail = ({ src, alt, width = 400, imgClassName = '' }: LazyThumbnailProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   // A 20px-wide version loads in milliseconds and looks fine when blurred.

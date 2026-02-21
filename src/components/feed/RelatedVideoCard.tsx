@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { type Video } from '../../store/usePlayerStore';
-import LazyThumbnail from '../LazyThumbnail';
+import LazyThumbnail from '../ui/LazyThumbnail';
 
 interface RelatedVideoCardProps {
   video: Video;
