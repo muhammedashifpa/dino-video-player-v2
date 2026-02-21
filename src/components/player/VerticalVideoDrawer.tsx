@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { usePlayerStore } from '../../store/usePlayerStore';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
 import CategoryPills from '../feed/CategoryPills';
+import CloseButton from '../ui/CloseButton';
 
 interface VerticalVideoDrawerProps {
   showDrawer: boolean;
@@ -45,6 +46,13 @@ const VerticalVideoDrawer: React.FC<VerticalVideoDrawerProps> = ({
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="absolute bottom-0 left-0 w-full h-[65%] bg-background-light/95 dark:bg-surface-dark/95 backdrop-blur-xl pointer-events-auto rounded-t-[32px] border-t border-black/5 dark:border-white/10 flex flex-col touch-none z-50 shadow-2xl"
           >
+            {/* Universal Outside Centered Close Button */}
+            <CloseButton 
+              onClick={() => setShowDrawer(false)}
+              className="flex absolute -top-20 left-1/2 -translate-x-1/2 w-12 h-12 z-50"
+              title="Close Drawer"
+            />
+
             <div
               className="w-12 h-1.5 bg-black/10 dark:bg-white/20 rounded-full mx-auto mt-4 mb-6 cursor-pointer"
               onClick={() => setShowDrawer(false)}
@@ -56,7 +64,8 @@ const VerticalVideoDrawer: React.FC<VerticalVideoDrawerProps> = ({
                 categories={categories}
                 selectedCategory={selectedCategory}
                 onSelect={setSelectedCategory}
-                containerClassName="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-none bg-transparent"
+                hidePadding
+                containerClassName="bg-transparent"
               />
             </div>
 

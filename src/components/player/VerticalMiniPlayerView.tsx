@@ -16,7 +16,7 @@ const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({
   if (!currentVideo) return null;
 
   return (
-    <div className="relative w-full h-full flex items-center pr-4 gap-3 bg-white dark:bg-background-dark/80 backdrop-blur-none dark:backdrop-blur-md border-none box-content z-20">
+    <div className="relative w-full h-full flex items-center pr-4 gap-3 bg-white dark:bg-background-dark/80 backdrop-blur-none dark:backdrop-blur-md border-none box-content z-20 cursor-pointer">
        {/* Dynamic Spacer for the shared video element */}
        <div className="w-28 h-full shrink-0">
           {/* 
@@ -60,7 +60,7 @@ const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({
        <div className="flex items-center gap-1">
           <button 
             onClick={handlePlayPause} 
-            className="w-12 h-12 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-all"
+            className="w-12 h-12 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-all cursor-pointer"
           >
              <span className="material-symbols-outlined text-3xl filled-icon">
                 {status === 'playing' ? 'pause' : 'play_arrow'}
@@ -68,7 +68,7 @@ const VerticalMiniPlayerView: React.FC<VerticalMiniPlayerViewProps> = ({
           </button>
           <button 
             onClick={handleClose} 
-            className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-white/40 active:scale-90 transition-transform"
+            className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-white/40 active:scale-90 transition-transform cursor-pointer"
           >
              <span className="material-symbols-outlined text-2xl">close</span>
           </button>

@@ -154,16 +154,20 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-0 left-0 w-full z-20 pb-8 pt-4 flex flex-col items-center pointer-events-auto"
+            className="absolute bottom-0 left-0 w-full z-20 pb-8 pt-4 flex flex-col items-center pointer-events-auto cursor-pointer group/swiper"
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={0.1}
+            onClick={() => setShowDrawer(true)}
             onDragEnd={(_, info) => {
               if (info.offset.y < -50) {
                 setShowDrawer(true);
               }
             }}
           >
+            {/* Background Highlight for Desktop Hover */}
+            <div className="absolute inset-0 bg-white/0 group-hover/swiper:bg-white/5 transition-colors pointer-events-none" />
+            
             {/* Progress Bar Container */}
             <div className="w-full px-6 mb-4">
               <div className="relative w-full h-6 flex items-center group">

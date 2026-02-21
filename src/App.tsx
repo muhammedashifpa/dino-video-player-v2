@@ -65,11 +65,11 @@ function App() {
           onSelect={setSelectedCategory}
         />
       </motion.div>
-      <main className="flex-1 pb-32 pt-[120px]">
+      <main className="flex-1 pb-32 pt-[120px] max-w-screen-2xl mx-auto w-full">
         {isLoading ? (
           // Render Skeletons in a grid or list
-          <div className="grid grid-cols-2 gap-4 px-4">
-            {Array.from({ length: 6 }).map((_, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 overflow-hidden">
+            {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonVideoCard key={index} />
             ))}
           </div>
@@ -81,7 +81,7 @@ function App() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="grid grid-cols-2 gap-4 px-4"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 overflow-hidden"
               variants={{
                 hidden: { opacity: 0 },
                 visible: {

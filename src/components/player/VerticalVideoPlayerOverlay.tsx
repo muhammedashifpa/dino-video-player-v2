@@ -5,6 +5,7 @@ import VerticalFullPlayerView from './VerticalFullPlayerView';
 import VerticalMiniPlayerView from './VerticalMiniPlayerView';
 import VerticalVideoDrawer from './VerticalVideoDrawer';
 import AutoPlayOverlay from './AutoPlayOverlay';
+import CloseButton from '../ui/CloseButton';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
 import type { Video } from '../../store/usePlayerStore';
 
@@ -32,6 +33,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const [isSeeking, setIsSeeking] = useState(false);
   const [isPiPActive, setIsPiPActive] = useState(false);
   const [nextVideoToAutoPlay, setNextVideoToAutoPlay] = useState<Video | null>(null);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,6 +126,13 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
       video.removeEventListener('enterpictureinpicture', handleEnterPiP);
       video.removeEventListener('leavepictureinpicture', handleLeavePiP);
     };
+  }, []);
+
+  // Window resize listener
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleTimeUpdate = () => {
@@ -296,20 +305,23 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     hidden: {
       width: originRect?.width ?? '100%',
       height: originRect?.height ?? '100%',
+      left: 0,
       x: 0,
       y: 0,
       borderRadius: 12,
     },
     full: {
-      width: '100%',
+      width: windowWidth > 640 ? 'min(100%, 430px)' : '100%',
       height: '100%',
-      x: 0,
+      left: windowWidth > 640 ? '50%' : '0%',
+      x: windowWidth > 640 ? '-50%' : '0%',
       y: 0,
       borderRadius: 0,
     },
     mini: {
       width: 112, // w-28
       height: 92,
+      left: 0,
       x: 0,
       y: 0,
       borderRadius: 0,
@@ -329,8 +341,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
         exit="hidden"
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onClick={() => viewMode === 'mini' && maximize()}
+        onMouseMove={resetAutoHideTimer}
         className={`fixed z-50 overflow-hidden shadow-2xl flex flex-col items-center ${
-          viewMode === 'mini' ? 'bg-transparent' : 'bg-black'
+          viewMode === 'mini' ? 'bg-transparent cursor-pointer' : 'bg-black'
         }`}
       >
         {/* Shared Video Container */}
@@ -338,7 +351,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
           variants={videoContainerVariants}
           initial="hidden"
           animate={viewMode}
-          className={`absolute left-0 top-0 overflow-hidden bg-black transition-all ${
+          className={`absolute top-0 overflow-hidden bg-black transition-all ${
             viewMode === 'mini' ? 'z-30 pointer-events-none' : 'z-0'
           }`}
         >
@@ -363,8 +376,16 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
         {/* Full Screen View Layers */}
         {viewMode === 'full' && (
-          <div className="absolute inset-0 w-full h-full flex flex-col max-w-[430px] mx-auto overflow-hidden">
-            {/* Layer 1: Player UI (Metadata & Controls) */}
+          <>
+            {/* Desktop Only Outside Close Button */}
+            <CloseButton 
+              onClick={handleClose}
+              className="hidden md:flex fixed top-6 right-6 w-12 h-12 z-60"
+              title="Close Player"
+            />
+
+            <div className="absolute inset-0 w-full h-full flex flex-col max-w-[430px] mx-auto overflow-hidden">
+              {/* Layer 1: Player UI (Metadata & Controls) */}
             <motion.div 
               className="absolute inset-0 w-full h-full z-20 flex flex-col"
               style={{ y: dragY, opacity, scale }}
@@ -408,8 +429,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 showDrawer={showDrawer}
                 setShowDrawer={setShowDrawer}
               />
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Mini Player View */}
