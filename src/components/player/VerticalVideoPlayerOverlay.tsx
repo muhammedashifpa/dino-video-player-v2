@@ -7,9 +7,24 @@ import VerticalVideoDrawer from './VerticalVideoDrawer';
 import AutoPlayOverlay from './AutoPlayOverlay';
 import CloseButton from '../ui/CloseButton';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
-import type { Video } from '../../store/usePlayerStore';
 import { optimizeThumbnail } from '../../utils/imageUtils';
+import { useAutoHideControls } from '../../hooks/useAutoHideControls';
+import { usePictureInPicture } from '../../hooks/usePictureInPicture';
+import { useVideoPlayback } from '../../hooks/useVideoPlayback';
+import { getOverlayVariants, getVideoContainerVariants } from './playerVariants';
 
+/**
+ * The primary video player overlay component.
+ * It manages the transition between full-screen and mini-player modes,
+ * handles gesture-based minimization, auto-play logic, and integrates
+ * video controls with metadata display.
+ * 
+ * It uses several custom hooks to separate concerns:
+ * - `useVideoPlayback`: Core playback logic and video element interactions.
+ * - `useAutoHideControls`: Auto-hiding UI based on user activity.
+ * - `usePictureInPicture`: Browser PiP API integration.
+ * - `usePlayerStore`: Global player state (current video, view mode, etc.).
+ */
 const VerticalVideoPlayerOverlay: React.FC = () => {
   const { 
     viewMode, 
@@ -29,19 +44,45 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     close
   } = usePlayerStore();
   
-  const [showControls, setShowControls] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [isSeeking, setIsSeeking] = useState(false);
-  const [isPiPActive, setIsPiPActive] = useState(false);
-  const [nextVideoToAutoPlay, setNextVideoToAutoPlay] = useState<Video | null>(null);
+  const [nextVideoToAutoPlay, setNextVideoToAutoPlay] = useState<any>(null);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
-  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const seekTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const { filteredVideos } = useVideoFeed(true);
   
+  const { showControls, setShowControls, resetAutoHideTimer } = useAutoHideControls({
+    viewMode,
+    status,
+    error
+  });
+
+  const { isPiPActive, togglePiP, exitPiP } = usePictureInPicture(videoRef);
+
+  const {
+    isSeeking,
+    handleTimeUpdate,
+    handleLoadedMetadata,
+    handlePlayPause,
+    handleSkipForward,
+    handleSkipBackward,
+    handleSeekChange,
+    handleSeekStart,
+    handleSeekEnd,
+    handleRetry
+  } = useVideoPlayback({
+    videoRef,
+    currentVideo,
+    status,
+    duration,
+    play,
+    pause,
+    setProgress,
+    setDuration,
+    setError,
+    onInteraction: resetAutoHideTimer
+  });
+
   // Drag and animation values
   const y = useMotionValue(0);
   const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
@@ -50,25 +91,6 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const opacity = useTransform(y, [0, screenHeight * 0.4], [1, 0.5]);
   const scale = useTransform(y, [0, screenHeight * 0.4], [1, 0.9]);
   const dragY = useTransform(y, [0, 800], [0, 800]);
-
-  // Helper to reset auto-hide timer
-  const resetAutoHideTimer = () => {
-    setShowControls(true);
-    setLastInteractionTime(Date.now());
-  };
-
-  // Auto-hide controls
-  useEffect(() => {
-    if (showControls && viewMode === 'full' && status === 'playing' && !error) {
-      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-      controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false);
-      }, 2000);
-    }
-    return () => {
-      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    };
-  }, [showControls, viewMode, status, error, lastInteractionTime]);
 
   // Reset y position when maximizing to full screen
   useEffect(() => {
@@ -96,83 +118,12 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     };
   }, [viewMode]);
 
-  // Sync video playback
-  useEffect(() => {
-    if (videoRef.current) {
-      if (status === 'playing') {
-        videoRef.current.play().catch(() => pause());
-      } else {
-        videoRef.current.pause();
-      }
-    }
-  }, [status, currentVideo, pause]);
-
-  // Picture-in-Picture event listeners
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleEnterPiP = () => setIsPiPActive(true);
-    const handleLeavePiP = () => setIsPiPActive(false);
-
-    video.addEventListener('enterpictureinpicture', handleEnterPiP);
-    video.addEventListener('leavepictureinpicture', handleLeavePiP);
-
-    // Set autoPiP manually as it might not be in the type definitions
-    if ('autoPictureInPicture' in video) {
-      (video as any).autoPictureInPicture = true;
-    }
-
-    return () => {
-      video.removeEventListener('enterpictureinpicture', handleEnterPiP);
-      video.removeEventListener('leavepictureinpicture', handleLeavePiP);
-    };
-  }, []);
-
   // Window resize listener
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current && !isSeeking) {
-      setProgress(videoRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handlePlayPause = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    resetAutoHideTimer();
-    if (status === 'playing') {
-      pause();
-    } else if (currentVideo) {
-      play(currentVideo);
-    }
-  };
-
-  const handleSkipForward = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    resetAutoHideTimer();
-    if (videoRef.current) {
-      videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, duration);
-    }
-  };
-
-  const handleSkipBackward = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    resetAutoHideTimer();
-    if (videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
-    }
-  };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (viewMode === 'full' && info.offset.y > 150) {
@@ -185,60 +136,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     setError("Failed to load video. Please check your connection or try again.");
   };
 
-  const handleRetry = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setError(null);
-    if (videoRef.current) {
-      videoRef.current.load();
-      play(currentVideo!);
-    }
-  };
-
-  const handleSeekChange = (time: number) => {
-    setProgress(time);
-    
-    if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current);
-    
-    seekTimeoutRef.current = setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.currentTime = time;
-      }
-    }, 100);
-  };
-
-  const handleSeekStart = () => {
-    setIsSeeking(true);
-    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-  };
-
-  const handleSeekEnd = () => {
-    setIsSeeking(false);
-  };
-
-  const handleTogglePiP = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!videoRef.current) return;
-
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture();
-      } else if (document.pictureInPictureEnabled) {
-        await videoRef.current.requestPictureInPicture();
-      }
-    } catch (error) {
-      console.error('PiP failed:', error);
-    }
-  };
-
   const handleClose = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (document.pictureInPictureElement && document.pictureInPictureElement === videoRef.current) {
-      try {
-        await document.exitPictureInPicture();
-      } catch (error) {
-        console.error('Failed to exit PiP on close:', error);
-      }
-    }
+    await exitPiP();
     close();
   };
 
@@ -275,61 +175,10 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
     }
   };
 
-  const overlayVariants = {
-    hidden: { 
-      top: originRect?.top ?? screenHeight,
-      left: originRect?.left ?? 0,
-      width: originRect?.width ?? '100%',
-      height: originRect?.height ?? '100%',
-      opacity: 0,
-      borderRadius: 12,
-    },
-    full: { 
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      opacity: 1,
-      borderRadius: 0,
-    },
-    mini: {
-      top: screenHeight - 92 - 40, // screenHeight - height - bottom_offset
-      left: 8,
-      width: 'calc(100% - 16px)',
-      height: 92,
-      opacity: 1,
-      borderRadius: 8,
-    }
-  };
-
-  const videoContainerVariants = {
-    hidden: {
-      width: originRect?.width ?? '100%',
-      height: originRect?.height ?? '100%',
-      left: 0,
-      x: 0,
-      y: 0,
-      borderRadius: 12,
-    },
-    full: {
-      width: windowWidth > 640 ? 'min(100%, 430px)' : '100%',
-      height: '100%',
-      left: windowWidth > 640 ? '50%' : '0%',
-      x: windowWidth > 640 ? '-50%' : '0%',
-      y: 0,
-      borderRadius: 0,
-    },
-    mini: {
-      width: 112, // w-28
-      height: 92,
-      left: 0,
-      x: 0,
-      y: 0,
-      borderRadius: 0,
-    }
-  };
-
   if (viewMode === 'hidden' || !currentVideo) return null;
+
+  const overlayVariants = getOverlayVariants(screenHeight, originRect);
+  const videoContainerVariants = getVideoContainerVariants(windowWidth, originRect);
 
   return (
     <AnimatePresence>
@@ -399,7 +248,6 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                   resetAutoHideTimer();
                 } else if (status === 'playing') {
                   setShowControls(false);
-                  if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
                 }
               }}
             >
@@ -414,7 +262,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 handlePlayPause={handlePlayPause}
                 handleSkipForward={handleSkipForward}
                 handleSkipBackward={handleSkipBackward}
-                handleTogglePiP={handleTogglePiP}
+                handleTogglePiP={togglePiP}
                 handleRetry={handleRetry}
                 onSeek={handleSeekChange}
                 onSeekStart={handleSeekStart}
