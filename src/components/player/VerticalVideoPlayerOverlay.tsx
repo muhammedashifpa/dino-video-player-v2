@@ -8,6 +8,7 @@ import AutoPlayOverlay from './AutoPlayOverlay';
 import CloseButton from '../ui/CloseButton';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
 import type { Video } from '../../store/usePlayerStore';
+import { optimizeThumbnail } from '../../utils/imageUtils';
 
 const VerticalVideoPlayerOverlay: React.FC = () => {
   const { 
@@ -358,7 +359,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
           <video
             ref={videoRef}
             src={currentVideo.mediaUrl}
-            poster={currentVideo.thumbnailUrl}
+            poster={optimizeThumbnail(currentVideo.thumbnailUrl, 400)}
             className="w-full h-full object-cover"
             playsInline
             onTimeUpdate={handleTimeUpdate}

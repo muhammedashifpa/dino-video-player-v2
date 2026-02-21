@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import CategoryTag from './CategoryTag';
+import LazyThumbnail from '../LazyThumbnail';
 
 
 export interface VideoCardProps {
@@ -32,10 +33,10 @@ const VideoCard: React.FC<VideoCardProps> = ({
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       <div className="relative w-full aspect-9/16 bg-surface-dark overflow-hidden rounded-lg shadow-md">
-        <img
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        <LazyThumbnail
           src={thumbnailUrl}
+          alt={title}
+          imgClassName="group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
           {duration}
