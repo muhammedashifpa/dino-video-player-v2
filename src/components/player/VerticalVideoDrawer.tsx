@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../store/usePlayerStore';
 import { useVideoFeed } from '../../hooks/useVideoFeed';
 import CategoryPills from '../feed/CategoryPills';
 import CloseButton from '../ui/CloseButton';
+import LazyThumbnail from '../LazyThumbnail';
 
 interface VerticalVideoDrawerProps {
   showDrawer: boolean;
@@ -100,7 +101,7 @@ const VerticalVideoDrawer: React.FC<VerticalVideoDrawerProps> = ({
                     <div className={`w-32 h-20 rounded-lg overflow-hidden bg-black/40 border shrink-0 relative ${
                       isActive ? 'border-primary/50' : 'border-white/5'
                     }`}>
-                      <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
+                      <LazyThumbnail src={video.thumbnailUrl} alt={video.title} width={200} />
                       {isActive && (
                         <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
                           <div className="flex gap-1 items-end h-5">
