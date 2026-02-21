@@ -8,7 +8,7 @@ const CLOUDINARY_CLOUD_NAME = 'dlirsqqey';
  * @param {number} width - Desired display width in px (default: 400)
  * @returns {string} Cloudinary fetch URL, or the original URL if input is empty
  */
-export function optimizeThumbnail(url, width = 400) {
+export function optimizeThumbnail(url: string | null | undefined, width: number = 400): string {
   if (!url) return '';
   const encodedUrl = encodeURIComponent(url);
   return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/fetch/f_auto,q_auto,w_${width}/${encodedUrl}`;
