@@ -292,7 +292,7 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
       borderRadius: 0,
     },
     mini: {
-      top: screenHeight - 92 - 80, // screenHeight - height - bottom_offset
+      top: screenHeight - 92 - 40, // screenHeight - height - bottom_offset
       left: 8,
       width: 'calc(100% - 16px)',
       height: 92,
