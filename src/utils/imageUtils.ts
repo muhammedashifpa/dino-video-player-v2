@@ -9,7 +9,7 @@ const CLOUDINARY_CLOUD_NAME = 'dcrhbqjbo';
  * @returns {string} Cloudinary fetch URL, or the original URL if input is empty
  */
 export function getVideoUrl(publicId: string): string {
-  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/q_auto,f_auto,w_1000,vc_auto/${publicId}`;
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/sp_auto/${publicId}.m3u8`;
 }
 
 export function optimizeThumbnail(url: string | null | undefined, width: number = 400): string {

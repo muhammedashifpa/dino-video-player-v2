@@ -11,6 +11,7 @@ import { optimizeThumbnail } from '../../utils/imageUtils';
 import { useAutoHideControls } from '../../hooks/useAutoHideControls';
 import { usePictureInPicture } from '../../hooks/usePictureInPicture';
 import { useVideoPlayback } from '../../hooks/useVideoPlayback';
+import { useHlsPlayer } from '../../hooks/useHlsPlayer';
 import { getOverlayVariants, getVideoContainerVariants } from './playerVariants';
 
 /**
@@ -48,7 +49,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   const [nextVideoToAutoPlay, setNextVideoToAutoPlay] = useState<any>(null);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
+  useHlsPlayer(videoRef, currentVideo?.mediaUrl);
+
   const { filteredVideos } = useVideoFeed(true);
   
   const { showControls, setShowControls, resetAutoHideTimer } = useAutoHideControls({
@@ -227,7 +230,6 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
         >
           <video
             ref={videoRef}
-            src={currentVideo.mediaUrl}
             poster={optimizeThumbnail(currentVideo.thumbnailUrl, 400)}
             className="w-full h-full object-cover"
             playsInline

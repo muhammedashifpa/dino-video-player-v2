@@ -24,7 +24,7 @@ const pregenerateTransformations = async () => {
         resource_type: 'video',
         type: 'upload',
         eager: [
-          { quality: 'auto', fetch_format: 'auto', width: 1000, video_codec: 'auto' },
+          { streaming_profile: 'auto', format: 'm3u8' },
         ],
         eager_async: true
       });
