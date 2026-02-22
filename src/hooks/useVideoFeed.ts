@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { VideoCardProps } from '../components/feed/VideoCard';
 import { MOCK_DATA } from '../data/mockData';
 import { DEFAULT_CATEGORY, LOAD_DELAY } from '../utils/constants';
+import { getVideoUrl } from '../utils/imageUtils';
 
 /**
  * Return type for the useVideoFeed hook.
@@ -55,7 +56,7 @@ export const useVideoFeed = (skipDelay = false): UseVideoFeedReturn => {
           categorySlug: c.category.slug,
           categoryName: c.category.name,
           slug: video.slug,
-          mediaUrl: video.mediaUrl,
+          mediaUrl: getVideoUrl(video.slug),
         }))
       );
 
