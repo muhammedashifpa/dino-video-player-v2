@@ -1,4 +1,4 @@
-# Dino Video Player v2
+# Dino Video Player
 
 A modern, mobile-first video player application built with React and TypeScript.
 
