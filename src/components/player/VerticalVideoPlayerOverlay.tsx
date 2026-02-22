@@ -64,8 +64,12 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
 
   const {
     isSeeking,
+    isBuffering,
     handleTimeUpdate,
     handleLoadedMetadata,
+    handleWaiting,
+    handlePlaying,
+    handleCanPlay,
     handlePlayPause,
     handleSkipForward,
     handleSkipBackward,
@@ -237,6 +241,9 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleVideoEnded}
             onError={handleVideoError}
+            onWaiting={handleWaiting}
+            onPlaying={handlePlaying}
+            onCanPlay={handleCanPlay}
           />
           {/* Gradient Overlay for Full Screen */}
           <motion.div 
@@ -273,12 +280,13 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
                 }
               }}
             >
-              <VerticalFullPlayerView 
+              <VerticalFullPlayerView
                 showControls={showControls}
                 status={status}
                 progress={progress}
                 duration={duration}
                 error={error}
+                isBuffering={isBuffering}
                 isSeeking={isSeeking}
                 isPiPActive={isPiPActive}
                 handlePlayPause={handlePlayPause}

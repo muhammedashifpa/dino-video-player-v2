@@ -47,6 +47,7 @@ export const useVideoPlayback = ({
   onInteraction
 }: UseVideoPlaybackProps) => {
   const [isSeeking, setIsSeeking] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
   const seekTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync video playback status
@@ -76,6 +77,10 @@ export const useVideoPlayback = ({
       setDuration(videoRef.current.duration);
     }
   };
+
+  const handleWaiting = () => setIsBuffering(true);
+  const handlePlaying = () => setIsBuffering(false);
+  const handleCanPlay = () => setIsBuffering(false);
 
   const handlePlayPause = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -134,8 +139,12 @@ export const useVideoPlayback = ({
 
   return {
     isSeeking,
+    isBuffering,
     handleTimeUpdate,
     handleLoadedMetadata,
+    handleWaiting,
+    handlePlaying,
+    handleCanPlay,
     handlePlayPause,
     handleSkipForward,
     handleSkipBackward,

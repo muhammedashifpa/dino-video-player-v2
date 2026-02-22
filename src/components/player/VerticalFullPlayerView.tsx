@@ -11,6 +11,7 @@ interface VerticalFullPlayerViewProps {
   progress: number;
   duration: number;
   error: string | null;
+  isBuffering: boolean;
   isSeeking: boolean;
   isPiPActive: boolean;
   handlePlayPause: (e?: React.MouseEvent) => void;
@@ -31,6 +32,7 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   progress,
   duration,
   error,
+  isBuffering,
   isSeeking,
   isPiPActive,
   handlePlayPause,
@@ -81,6 +83,20 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
                 Close Player
               </button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Buffering Spinner */}
+      <AnimatePresence>
+        {isBuffering && !error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
+          >
+            <div className="w-14 h-14 rounded-full border-4 border-white/20 border-t-white animate-spin" />
           </motion.div>
         )}
       </AnimatePresence>
