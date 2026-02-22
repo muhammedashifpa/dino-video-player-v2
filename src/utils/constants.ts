@@ -1,4 +1,3 @@
 export const DEFAULT_CATEGORY = 'All';
 export const SCROLL_THRESHOLD = 50;
 export const LOAD_DELAY = 2000;
-export const PROFILE_IMAGE_URL = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLmfgZYWj9Q9df0_8AVqCzDbhC_MpjyQSXo_nwBodQJcKaS_j8HBLw6zfoNCZWJ_yVhhcfJ22bgkpBmCgH3jZNG8R-0duu_7zIi8SgYSJoB1WUDWZ1ifazL1Gv-BnOuZODL_IGTLq-ZriJG3ACriEBMM0OzvyLUD_b_aOFNINWjJCL2o3GbpnBDo4c9gseN1FLieHUCW1WTeqevSGvqY_u5u8ePv_IoK6eol0Ae9IEOEe-tCQn2TQ7a51z3NqOoZ-wSZ9F6BLb1noD';

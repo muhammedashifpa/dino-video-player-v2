@@ -4,14 +4,22 @@ A modern, mobile-first video player application built with React and TypeScript.
 
 ## Features
 
-- 📱 **Mobile-First Design**: Optimized layout for mobile devices with native-like scrolling and gestures.
-- 🎥 **Advanced Video Player**:
-  - **Full-Screen Playback**: Immersive viewing experience.
-  - **Mini-Player**: Picture-in-Picture style, draggable, and persistent across navigation.
-  - **Smooth Transitions**: Animated transitions between mini and full modes using Framer Motion.
+- ☁️ **Cloudinary Optimized Delivery**: High-performance image and video delivery with smart caching and browser-specific format selection (WebM/MP4).
+- 📱 **Advanced Mini-Player**: Native-like Picture-in-Picture (PiP) experience, draggable and persistent across the app.
+- 🎬 **Fluid Motion & Animations**: Premium transitions powered by **Framer Motion**, including:
+  - Seamless video card to player overlay expansion.
+  - Smooth tab switching animations.
+  - Active video indicator animations in the drawer list.
+- 📐 **Dynamic Header Behavior**: Smart header that automatically shows or hides based on scroll direction.
+- 📥 **Interactive Drawer Interface**: YouTube-inspired drawer system with snap points and unified gesture controls (drag-to-minimize).
+- 🔄 **Smart Playback Features**:
+  - **Auto-Play Next**: Seamless transition to the next video in the feed.
+  - **Visual Seek Feedback**: Instant visual indicators when skipping forward or backward.
+  - **Intelligent Filtering**: Category-based filtering in both the home feed and the upcoming videos drawer.
 - 🌓 **Dark Mode Support**: Seamless integration with system preferences.
+- ⚠️ **Robust Error Handling**: Dedicated error screens to ensure a graceful and reliable user experience.
 - ⚡ **High Performance**: Built with Vite for fast HMR and optimized production builds.
-- 🧩 **State Management**: Powered by Zustand for predictable state updates.
+- 🧩 **Modern Tech Stack**: Powered by React 18, TypeScript, Tailwind CSS v4, and Zustand.
 
 ## Tech Stack
 
