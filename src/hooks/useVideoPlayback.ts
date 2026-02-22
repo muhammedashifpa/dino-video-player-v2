@@ -53,7 +53,12 @@ export const useVideoPlayback = ({
   useEffect(() => {
     if (videoRef.current) {
       if (status === 'playing') {
-        videoRef.current.play().catch(() => pause());
+        videoRef.current.play().catch((error) => {
+          if (error.name === 'NotAllowedError') {
+            setError("Autoplay blocked. Please click play to start the video.");
+          }
+          pause();
+        });
       } else {
         videoRef.current.pause();
       }

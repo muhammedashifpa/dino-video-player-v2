@@ -133,7 +133,27 @@ const VerticalVideoPlayerOverlay: React.FC = () => {
   };
 
   const handleVideoError = () => {
-    setError("Failed to load video. Please check your connection or try again.");
+    const mediaError = videoRef.current?.error;
+    let message = "An unknown error occurred during playback.";
+
+    if (mediaError) {
+      switch (mediaError.code) {
+        case MediaError.MEDIA_ERR_ABORTED:
+          message = "Playback was aborted by the user.";
+          break;
+        case MediaError.MEDIA_ERR_NETWORK:
+          message = "Network error: Connection to the video server failed.";
+          break;
+        case MediaError.MEDIA_ERR_DECODE:
+          message = "Decoding error: Your device cannot play this video format.";
+          break;
+        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+          message = "Source error: The video could not be loaded or the format is not supported.";
+          break;
+      }
+    }
+    
+    setError(message);
   };
 
   const handleClose = async (e: React.MouseEvent) => {
