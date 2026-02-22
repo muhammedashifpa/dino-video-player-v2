@@ -44,7 +44,7 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
   showDrawer,
   setShowDrawer
 }) => {
-  const { currentVideo, minimize } = usePlayerStore();
+  const { currentVideo, minimize, close } = usePlayerStore();
 
   if (!currentVideo) return null;
 
@@ -65,13 +65,22 @@ const VerticalFullPlayerView: React.FC<VerticalFullPlayerViewProps> = ({
             <span className="material-symbols-outlined text-white/40 text-6xl mb-6">error</span>
             <h3 className="text-white text-lg font-bold mb-2">Playback Error</h3>
             <p className="text-white/60 text-sm mb-8 max-w-xs">{error}</p>
-            <button 
-              onClick={handleRetry}
-              className="px-8 py-3 rounded-full bg-white text-black font-bold text-sm active:scale-95 transition-transform flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-sm">replay</span>
-              Try Again
-            </button>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleRetry}
+                className="px-8 py-3 rounded-full bg-white text-black font-bold text-sm active:scale-95 transition-transform flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">replay</span>
+                Try Again
+              </button>
+              <button 
+                onClick={close}
+                className="px-8 py-3 rounded-full bg-white/10 text-white font-bold text-sm active:scale-95 transition-transform flex items-center justify-center gap-2 border border-white/20"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+                Close Player
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
